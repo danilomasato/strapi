@@ -1,0 +1,24 @@
+{
+  "kind": "collectionType",
+  "collectionName": "tipos",
+  "info": {
+    "singularName": "tipo",
+    "pluralName": "tipos",
+    "displayName": "Tipo"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "imovel": {
+      "type": "string"
+    },
+    "articles": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::article.article",
+      "mappedBy": "tipo"
+    }
+  }
+}
