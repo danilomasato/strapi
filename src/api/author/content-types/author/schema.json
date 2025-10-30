@@ -28,9 +28,9 @@
     "email": {
       "type": "string"
     },
-    "articles": {
+    "imoveis": {
       "type": "relation",
-      "relation": "oneToMany",
+      "relation": "oneToOne",
       "target": "api::article.article",
       "mappedBy": "autor"
     },

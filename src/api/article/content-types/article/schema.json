@@ -31,7 +31,7 @@
           "localized": true
         }
       },
-      "maxLength": 80
+      "maxLength": 400
     },
     "fotos": {
       "type": "media",
@@ -50,9 +50,9 @@
     },
     "autor": {
       "type": "relation",
-      "relation": "manyToOne",
+      "relation": "oneToOne",
       "target": "api::author.author",
-      "inversedBy": "articles"
+      "inversedBy": "imoveis"
     },
     "blocks": {
       "type": "dynamiczone",
@@ -183,6 +183,14 @@
       }
     },
     "valor_aluguel": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
+    },
+    "regiao": {
       "type": "string",
       "pluginOptions": {
         "i18n": {
