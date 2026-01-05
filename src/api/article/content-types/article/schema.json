@@ -80,14 +80,8 @@
       "target": "api::tipo.tipo",
       "inversedBy": "articles"
     },
-    "cidade": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::category.category",
-      "inversedBy": "articles"
-    },
     "Andar": {
-      "type": "string",
+      "type": "integer",
       "pluginOptions": {
         "i18n": {
           "localized": true
