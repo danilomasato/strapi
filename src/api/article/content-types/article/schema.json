@@ -16,7 +16,7 @@
     }
   },
   "attributes": {
-    "rua": {
+    "imovel": {
       "type": "string",
       "pluginOptions": {
         "i18n": {
