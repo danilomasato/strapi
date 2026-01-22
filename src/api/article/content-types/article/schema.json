@@ -16,22 +16,6 @@
     }
   },
   "attributes": {
-    "rua": {
-      "type": "text",
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "imovel": {
-      "type": "text",
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
     "descricao": {
       "type": "text",
       "pluginOptions": {
@@ -193,6 +177,14 @@
       }
     },
     "regiao": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
+    },
+    "titulo": {
       "type": "string",
       "pluginOptions": {
         "i18n": {
