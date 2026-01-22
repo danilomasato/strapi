@@ -16,6 +16,14 @@
     }
   },
   "attributes": {
+    "rua": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
+    },
     "imovel": {
       "type": "string",
       "pluginOptions": {
