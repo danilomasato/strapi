@@ -605,8 +605,7 @@ export interface ApiArticleArticle extends Struct.CollectionTypeSchema {
         i18n: {
           localized: true;
         };
-      }> &
-      Schema.Attribute.DefaultTo<'imovel'>;
+      }>;
     Suites: Schema.Attribute.String &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
