@@ -568,15 +568,9 @@ export interface ApiArticleArticle extends Struct.CollectionTypeSchema {
         };
       }> &
       Schema.Attribute.SetMinMaxLength<{
-        maxLength: 400;
+        maxLength: 3000;
       }>;
     fotos: Schema.Attribute.Media<'images' | 'files' | 'videos', true> &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true;
-        };
-      }>;
-    imovel: Schema.Attribute.String &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true;
@@ -606,6 +600,13 @@ export interface ApiArticleArticle extends Struct.CollectionTypeSchema {
           localized: true;
         };
       }>;
+    rua: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }> &
+      Schema.Attribute.DefaultTo<'imovel'>;
     Suites: Schema.Attribute.String &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
