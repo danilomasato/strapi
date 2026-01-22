@@ -17,7 +17,7 @@
   },
   "attributes": {
     "rua": {
-      "type": "string",
+      "type": "text",
       "pluginOptions": {
         "i18n": {
           "localized": true
@@ -25,7 +25,7 @@
       }
     },
     "imovel": {
-      "type": "string",
+      "type": "text",
       "pluginOptions": {
         "i18n": {
           "localized": true
