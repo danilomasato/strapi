@@ -16,6 +16,14 @@
     }
   },
   "attributes": {
+    "Titulo": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
+    },
     "descricao": {
       "type": "text",
       "pluginOptions": {
@@ -24,14 +32,6 @@
         }
       },
       "maxLength": 400
-    },
-    "endereco": {
-      "type": "string",
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
     },
     "fotos": {
       "type": "media",

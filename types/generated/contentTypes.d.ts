@@ -570,12 +570,6 @@ export interface ApiArticleArticle extends Struct.CollectionTypeSchema {
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 400;
       }>;
-    endereco: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true;
-        };
-      }>;
     fotos: Schema.Attribute.Media<'images' | 'files' | 'videos', true> &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
@@ -613,6 +607,12 @@ export interface ApiArticleArticle extends Struct.CollectionTypeSchema {
         };
       }>;
     tipo: Schema.Attribute.Relation<'manyToOne', 'api::tipo.tipo'>;
+    Titulo: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
