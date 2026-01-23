@@ -24,6 +24,12 @@
         }
       }
     },
+    "autor": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::author.author",
+      "inversedBy": "imoveis"
+    },
     "descricao": {
       "type": "text",
       "pluginOptions": {
@@ -47,12 +53,6 @@
         "files",
         "videos"
       ]
-    },
-    "autor": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::author.author",
-      "inversedBy": "imoveis"
     },
     "blocks": {
       "type": "dynamiczone",
