@@ -16,14 +16,6 @@
     }
   },
   "attributes": {
-    "imovel": {
-      "type": "string",
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
     "descricao": {
       "type": "text",
       "pluginOptions": {
@@ -32,6 +24,15 @@
         }
       },
       "maxLength": 400
+    },
+    "imovel": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "required": true
     },
     "fotos": {
       "type": "media",
