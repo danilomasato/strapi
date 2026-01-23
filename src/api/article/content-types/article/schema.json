@@ -25,14 +25,13 @@
       },
       "maxLength": 400
     },
-    "imovel": {
+    "endereco": {
       "type": "string",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
-      },
-      "required": true
+      }
     },
     "fotos": {
       "type": "media",

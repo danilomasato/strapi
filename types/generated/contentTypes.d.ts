@@ -570,14 +570,13 @@ export interface ApiArticleArticle extends Struct.CollectionTypeSchema {
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 400;
       }>;
-    fotos: Schema.Attribute.Media<'images' | 'files' | 'videos', true> &
+    endereco: Schema.Attribute.String &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true;
         };
       }>;
-    imovel: Schema.Attribute.String &
-      Schema.Attribute.Required &
+    fotos: Schema.Attribute.Media<'images' | 'files' | 'videos', true> &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true;
