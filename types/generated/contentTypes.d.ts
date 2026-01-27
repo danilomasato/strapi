@@ -482,6 +482,19 @@ export interface ApiAnuncioAnuncio extends Struct.CollectionTypeSchema {
         };
       }>;
     author: Schema.Attribute.Relation<'oneToOne', 'api::author.author'>;
+    Condominio: Schema.Attribute.String &
+      Schema.Attribute.CustomField<
+        'plugin::superfields.tooltip-field',
+        {
+          description: 'Digite Somente o Valor';
+          'tooltip-content': 'Digite Somente o Valor';
+        }
+      > &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -507,6 +520,21 @@ export interface ApiAnuncioAnuncio extends Struct.CollectionTypeSchema {
     >;
     publishedAt: Schema.Attribute.DateTime;
     tipo: Schema.Attribute.Relation<'manyToOne', 'api::tipo.tipo'>;
+    Tipo_de_Anuncio: Schema.Attribute.String &
+      Schema.Attribute.CustomField<
+        'plugin::superfields.multi-select',
+        {
+          enumValues: ['Venda', 'Aluguel', 'Venda e Aluguel'];
+          nestedOptions: '[\n  {\n    "label": "Group 1",\n    "value": "group1",\n    "children": [\n      {\n        "label": "Option A",\n        "value": "optA"\n      },\n      {\n        "label": "Option B",\n        "value": "optB"\n      }\n    ]\n  },\n  {\n    "label": "Group 2",\n    "value": "group2"\n  }\n]';
+          selectType: 'multi';
+          'tooltip-content': 'Selecione o tipo anuncio';
+        }
+      > &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
     titulo: Schema.Attribute.String &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
@@ -992,6 +1020,43 @@ export interface PluginReviewWorkflowsWorkflowStage
   };
 }
 
+export interface PluginSuperfieldsColor extends Struct.CollectionTypeSchema {
+  collectionName: 'colors';
+  info: {
+    displayName: 'color';
+    pluralName: 'colors';
+    singularName: 'color';
+  };
+  options: {
+    comment: '';
+    draftAndPublish: false;
+  };
+  pluginOptions: {
+    'content-manager': {
+      visible: false;
+    };
+    'content-type-builder': {
+      visible: false;
+    };
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    hex: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'plugin::superfields.color'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface PluginUploadFile extends Struct.CollectionTypeSchema {
   collectionName: 'files';
   info: {
@@ -1276,6 +1341,7 @@ declare module '@strapi/strapi' {
       'plugin::i18n.locale': PluginI18NLocale;
       'plugin::review-workflows.workflow': PluginReviewWorkflowsWorkflow;
       'plugin::review-workflows.workflow-stage': PluginReviewWorkflowsWorkflowStage;
+      'plugin::superfields.color': PluginSuperfieldsColor;
       'plugin::upload.file': PluginUploadFile;
       'plugin::upload.folder': PluginUploadFolder;
       'plugin::users-permissions.permission': PluginUsersPermissionsPermission;
