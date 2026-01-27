@@ -28,6 +28,19 @@
       "relation": "oneToOne",
       "target": "api::author.author",
       "inversedBy": "anuncio"
+    },
+    "fotos": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "Andar": {
+      "type": "integer"
     }
   }
 }

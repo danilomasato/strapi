@@ -470,11 +470,16 @@ export interface ApiAnuncioAnuncio extends Struct.CollectionTypeSchema {
     draftAndPublish: false;
   };
   attributes: {
+    Andar: Schema.Attribute.Integer;
     author: Schema.Attribute.Relation<'oneToOne', 'api::author.author'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     descricao: Schema.Attribute.Blocks;
+    fotos: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios',
+      true
+    >;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
