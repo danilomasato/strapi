@@ -11,17 +11,23 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "modalidade": {
+    "titulo": {
       "type": "string"
     },
-    "articles": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::article.article",
-      "mappedBy": "anuncio"
+    "descricao": {
+      "type": "blocks"
     },
-    "slug": {
-      "type": "uid"
+    "tipo": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::tipo.tipo",
+      "inversedBy": "anuncios"
+    },
+    "author": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::author.author",
+      "inversedBy": "anuncio"
     }
   }
 }

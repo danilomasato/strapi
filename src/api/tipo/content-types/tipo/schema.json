@@ -14,10 +14,10 @@
     "imovel": {
       "type": "string"
     },
-    "articles": {
+    "anuncios": {
       "type": "relation",
       "relation": "oneToMany",
-      "target": "api::article.article",
+      "target": "api::anuncio.anuncio",
       "mappedBy": "tipo"
     }
   }

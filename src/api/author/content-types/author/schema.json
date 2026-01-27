@@ -28,11 +28,11 @@
     "email": {
       "type": "string"
     },
-    "imoveis": {
+    "anuncio": {
       "type": "relation",
       "relation": "oneToOne",
-      "target": "api::article.article",
-      "mappedBy": "autor"
+      "target": "api::anuncio.anuncio",
+      "mappedBy": "author"
     },
     "contato": {
       "type": "biginteger"

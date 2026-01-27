@@ -33,12 +33,6 @@
       },
       "maxLength": 400
     },
-    "autor": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::author.author",
-      "inversedBy": "imoveis"
-    },
     "fotos": {
       "type": "media",
       "pluginOptions": {
@@ -67,24 +61,6 @@
         "shared.rich-text",
         "shared.slider"
       ]
-    },
-    "anuncio": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::anuncio.anuncio",
-      "inversedBy": "articles"
-    },
-    "tipo": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::tipo.tipo",
-      "inversedBy": "articles"
-    },
-    "cidade": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::category.category",
-      "inversedBy": "articles"
     },
     "Andar": {
       "type": "string",
