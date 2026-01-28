@@ -522,12 +522,11 @@ export interface ApiAnuncioAnuncio extends Struct.CollectionTypeSchema {
     tipo: Schema.Attribute.Relation<'manyToOne', 'api::tipo.tipo'>;
     Tipo_de_Anuncio: Schema.Attribute.String &
       Schema.Attribute.CustomField<
-        'plugin::superfields.multi-select',
+        'plugin::superfields.tooltip-enum-field',
         {
-          enumValues: ['Venda', 'Aluguel', 'Venda e Aluguel'];
-          nestedOptions: '[\n  {\n    "label": "Group 1",\n    "value": "group1",\n    "children": [\n      {\n        "label": "Option A",\n        "value": "optA"\n      },\n      {\n        "label": "Option B",\n        "value": "optB"\n      }\n    ]\n  },\n  {\n    "label": "Group 2",\n    "value": "group2"\n  }\n]';
-          selectType: 'multi';
-          'tooltip-content': 'Selecione o tipo anuncio';
+          description: 'Selecione o tipo de anuncio';
+          enumValues: 'venda\naluguel\nvenda e aluguel';
+          'tooltip-content': 'Selecione o tipo de anuncio';
         }
       > &
       Schema.Attribute.SetPluginOptions<{

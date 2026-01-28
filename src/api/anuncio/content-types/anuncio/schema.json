@@ -86,16 +86,11 @@
           "localized": true
         }
       },
-      "customField": "plugin::superfields.multi-select",
+      "customField": "plugin::superfields.tooltip-enum-field",
       "options": {
-        "selectType": "multi",
-        "nestedOptions": "[\n  {\n    \"label\": \"Group 1\",\n    \"value\": \"group1\",\n    \"children\": [\n      {\n        \"label\": \"Option A\",\n        \"value\": \"optA\"\n      },\n      {\n        \"label\": \"Option B\",\n        \"value\": \"optB\"\n      }\n    ]\n  },\n  {\n    \"label\": \"Group 2\",\n    \"value\": \"group2\"\n  }\n]",
-        "enumValues": [
-          "Venda",
-          "Aluguel",
-          "Venda e Aluguel"
-        ],
-        "tooltip-content": "Selecione o tipo anuncio"
+        "enumValues": "venda\naluguel\nvenda e aluguel",
+        "description": "Selecione o tipo de anuncio",
+        "tooltip-content": "Selecione o tipo de anuncio"
       }
     }
   }
