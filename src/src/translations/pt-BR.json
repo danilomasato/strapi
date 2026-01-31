@@ -313,7 +313,7 @@
   "app.utils.select-all": "Selecionar todos",
   "app.utils.select-field": "Selecionar campo",
   "app.utils.select-filter": "Selecionar filtro",
-  "app.utils.unpublish": "Despublicar",
+  "app.utils.unpublish": "Inativar",
   "clearLabel": "Limpar",
   "coming.soon": "Esse conteúdo está sendo construído e voltará dentro de algumas semanas!",
   "component.Input.error.validation.integer": "O valor deve ser um inteiro",
