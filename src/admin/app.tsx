@@ -1,7 +1,29 @@
 import type { StrapiApp } from '@strapi/strapi/admin';
+import './styles/global.css';
 
 export default {
   config: {
+    head: {
+      styles: [
+        `
+        /* Exemplo: Ocultar o botão de Preview */
+        [data-testid="preview-button"], 
+        button[name="preview"] {
+          display: none !important;
+        }
+
+        /* Exemplo: Mudar a cor do cabeçalho da sidebar */
+        aside h2 {
+          color: #7b79ff !important;
+        }
+
+        /* Exemplo: Customizar botões específicos */
+        .sc-gjTGDA { 
+          border-radius: 0px !important; 
+        }
+        `
+      ],
+    },
     defaultLocale: 'pt-BR',
     locales: ['pt-BR'],
     translations: {
@@ -21,6 +43,7 @@ export default {
           'content-manager.actions.publish.label': 'Publicar agora',
           'content-manager.actions.delete.label': 'Excluir Registro',
           'content-manager.actions.clone.label': 'Duplicar Item',
+          
           // --- BUSCA E FILTROS ---
           'content-manager.components.Filters.add': 'Adicionar Filtro',
           'content-manager.components.Filters.title': 'Filtros',
