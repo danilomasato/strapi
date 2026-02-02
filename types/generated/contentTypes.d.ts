@@ -525,7 +525,6 @@ export interface ApiAnuncioAnuncio extends Struct.CollectionTypeSchema {
       'api::anuncio.anuncio'
     >;
     publishedAt: Schema.Attribute.DateTime;
-    tipo: Schema.Attribute.Relation<'manyToOne', 'api::tipo.tipo'>;
     Tipo_de_Anuncio: Schema.Attribute.String &
       Schema.Attribute.CustomField<
         'plugin::superfields.tooltip-enum-field',
@@ -533,6 +532,20 @@ export interface ApiAnuncioAnuncio extends Struct.CollectionTypeSchema {
           description: 'Selecione o tipo de anuncio';
           enumValues: 'venda\naluguel\nvenda e aluguel';
           'tooltip-content': 'Selecione o tipo de anuncio';
+        }
+      > &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    Tipo_Residencia: Schema.Attribute.String &
+      Schema.Attribute.CustomField<
+        'plugin::superfields.tooltip-enum-field',
+        {
+          description: 'Selecione o tipo de Resid\u00EAncia ex: "Apartamento, Casa, studio"';
+          enumValues: 'Apartamento Comercial\nApartamento Residencial\nCasa Residencial\nStudio';
+          'tooltip-content': 'Selecione o tipo de Resid\u00EAncia ex: "Apartamento, Casa, studio"';
         }
       > &
       Schema.Attribute.SetPluginOptions<{
@@ -773,7 +786,6 @@ export interface ApiTipoTipo extends Struct.CollectionTypeSchema {
     draftAndPublish: false;
   };
   attributes: {
-    anuncios: Schema.Attribute.Relation<'oneToMany', 'api::anuncio.anuncio'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

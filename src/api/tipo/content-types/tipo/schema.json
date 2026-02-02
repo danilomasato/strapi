@@ -13,12 +13,6 @@
   "attributes": {
     "imovel": {
       "type": "string"
-    },
-    "anuncios": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::anuncio.anuncio",
-      "mappedBy": "tipo"
     }
   }
 }

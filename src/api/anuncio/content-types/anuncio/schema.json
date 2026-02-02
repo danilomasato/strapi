@@ -31,12 +31,6 @@
         }
       }
     },
-    "tipo": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::tipo.tipo",
-      "inversedBy": "anuncios"
-    },
     "author": {
       "type": "relation",
       "relation": "oneToOne",
@@ -58,12 +52,32 @@
         "audios"
       ]
     },
-    "Andar": {
-      "type": "integer",
+    "Tipo_de_Anuncio": {
+      "type": "customField",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
+      },
+      "customField": "plugin::superfields.tooltip-enum-field",
+      "options": {
+        "enumValues": "venda\naluguel\nvenda e aluguel",
+        "description": "Selecione o tipo de anuncio",
+        "tooltip-content": "Selecione o tipo de anuncio"
+      }
+    },
+    "Tipo_Residencia": {
+      "type": "customField",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "customField": "plugin::superfields.tooltip-enum-field",
+      "options": {
+        "tooltip-content": "Selecione o tipo de Residência ex: \"Apartamento, Casa, studio\"",
+        "description": "Selecione o tipo de Residência ex: \"Apartamento, Casa, studio\"",
+        "enumValues": "Apartamento Comercial\nApartamento Residencial\nCasa Residencial\nStudio"
       }
     },
     "Condominio": {
@@ -79,18 +93,12 @@
         "description": "Digite Somente o Valor"
       }
     },
-    "Tipo_de_Anuncio": {
-      "type": "customField",
+    "Andar": {
+      "type": "integer",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
-      },
-      "customField": "plugin::superfields.tooltip-enum-field",
-      "options": {
-        "enumValues": "venda\naluguel\nvenda e aluguel",
-        "description": "Selecione o tipo de anuncio",
-        "tooltip-content": "Selecione o tipo de anuncio"
       }
     },
     "Ano_de_Construcao": {
