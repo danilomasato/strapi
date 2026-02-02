@@ -487,6 +487,19 @@ export interface ApiAnuncioAnuncio extends Struct.CollectionTypeSchema {
           localized: true;
         };
       }>;
+    Area_Terreno: Schema.Attribute.String &
+      Schema.Attribute.CustomField<
+        'plugin::superfields.tooltip-field',
+        {
+          description: 'Digite o Valor do Terreno em m\u00B2';
+          'tooltip-content': 'Digite o Valor do Terreno em m\u00B2';
+        }
+      > &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
     author: Schema.Attribute.Relation<'oneToOne', 'api::author.author'>;
     Condominio: Schema.Attribute.String &
       Schema.Attribute.CustomField<

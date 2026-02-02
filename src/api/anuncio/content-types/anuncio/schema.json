@@ -108,6 +108,19 @@
           "localized": true
         }
       }
+    },
+    "Area_Terreno": {
+      "type": "customField",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "customField": "plugin::superfields.tooltip-field",
+      "options": {
+        "tooltip-content": "Digite o Valor do Terreno em m²",
+        "description": "Digite o Valor do Terreno em m²"
+      }
     }
   }
 }
