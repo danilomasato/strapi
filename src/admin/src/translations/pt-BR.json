@@ -1,4 +1,7 @@
 {
+  "containers.edit.title.new": "Criar Nova Anúnio",
+  "HeaderLayout.button.label-add-entry": "Criar Nova Anúnio",
+  "containers.edit.title.new": "Criar Nova Anúnio",
   "Analytics": "Monitoramento",
   "Auth.components.Oops.text": "Sua conta foi suspensa.",
   "Auth.components.Oops.text.admin": "Se isso foi um erro, por favor, contate seu administrador.",
