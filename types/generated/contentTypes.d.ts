@@ -481,6 +481,12 @@ export interface ApiAnuncioAnuncio extends Struct.CollectionTypeSchema {
           localized: true;
         };
       }>;
+    Ano_de_Construcao: Schema.Attribute.Date &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
     author: Schema.Attribute.Relation<'oneToOne', 'api::author.author'>;
     Condominio: Schema.Attribute.String &
       Schema.Attribute.CustomField<

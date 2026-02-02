@@ -92,6 +92,14 @@
         "description": "Selecione o tipo de anuncio",
         "tooltip-content": "Selecione o tipo de anuncio"
       }
+    },
+    "Ano_de_Construcao": {
+      "type": "date",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
     }
   }
 }
