@@ -14,10 +14,28 @@ time, mark, audio, video {
 	font-size: 1rem !important;
 }
 
+
 #main-content > form > div.sc-beySbL.RhbPD.sc-guDLRU.eESRvY > div.sc-beySbL.lALYN.sc-guDLRU.eNFMuC > h1 {
+    font-size: 1.7rem !important;
     color: #000 !important;
+}
+
+input[type="text"] {
+	font-size: 0.95rem !important;
+}
+
+span,
+ol li:hover span, ul li:hover span,
+div.sc-beySbL.ceLAnO.sc-guDLRU.jfNlOw > div > div > div:nth-child(1) > div:nth-child(2) > div > div.sc-beySbL.lALYN.sc-guDLRU.bYszAe.sc-geUUNK.jIJdjW > div > div.sc-cmfmEr.DBgdU > span input {
+    color: #000 !important;
+	font-size: 1rem !important;
+
 }
 
 aside[aria-labelledby="additional-information"]:nth-child(2) {
     display: none !important;
+}
+
+#main-content > form aside > div > div > div > div > div > button span {
+    color: #fff !important;
 }
