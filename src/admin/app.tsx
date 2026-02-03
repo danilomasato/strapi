@@ -1,5 +1,5 @@
 import type { StrapiApp } from '@strapi/strapi/admin';
-import './styles/globals.css';
+import './styles/app.css';
 
 export default {
   config: {
