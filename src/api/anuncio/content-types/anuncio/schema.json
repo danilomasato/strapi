@@ -52,6 +52,20 @@
         "audios"
       ]
     },
+    "Andar": {
+      "type": "customField",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "customField": "plugin::superfields.tooltip-number-field",
+      "options": {
+        "numberType": "Integer",
+        "description": "Use as setas para Cima/Baixo para escolher o Andar"
+      },
+      "default": 0
+    },
     "Tipo_de_Anuncio": {
       "type": "customField",
       "pluginOptions": {
@@ -93,14 +107,6 @@
         "description": "Digite Somente o Valor"
       }
     },
-    "Andar": {
-      "type": "integer",
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
     "Ano_de_Construcao": {
       "type": "date",
       "pluginOptions": {
@@ -120,6 +126,85 @@
       "options": {
         "tooltip-content": "Digite o Valor do Terreno em m²",
         "description": "Digite o Valor do Terreno em m²"
+      }
+    },
+    "Valor_Venda": {
+      "type": "customField",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "customField": "plugin::superfields.tooltip-field",
+      "options": {
+        "description": "Digite Somente o Valor da Venda (sem o R$)",
+        "tooltip-content": ""
+      }
+    },
+    "Valor_Aluguel": {
+      "type": "customField",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "customField": "plugin::superfields.tooltip-field",
+      "options": {
+        "tooltip-content": "",
+        "description": "Digite Somente o Valor do Aluguel (sem o R$)"
+      }
+    },
+    "Bairro": {
+      "type": "customField",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "customField": "plugin::superfields.tooltip-field",
+      "options": {
+        "description": "Digite a região do imóvel"
+      }
+    },
+    "Quartos": {
+      "type": "customField",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "customField": "plugin::superfields.tooltip-number-field",
+      "options": {
+        "numberType": "Integer",
+        "description": "Use as setas para Cima/Baixo para escolher a quantidade de Quartos"
+      },
+      "default": 0
+    },
+    "Suites": {
+      "type": "customField",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "customField": "plugin::superfields.tooltip-number-field",
+      "options": {
+        "numberType": "Integer",
+        "description": "Use as setas para Cima/Baixo para escolher a quantidade de Suítes"
+      },
+      "default": 0
+    },
+    "IPTU": {
+      "type": "customField",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "customField": "plugin::superfields.tooltip-field",
+      "options": {
+        "description": "Digite Somente o Valor do IPTU (Sem o R$)",
+        "default": "0"
       }
     }
   }

@@ -476,11 +476,19 @@ export interface ApiAnuncioAnuncio extends Struct.CollectionTypeSchema {
   };
   attributes: {
     Andar: Schema.Attribute.Integer &
+      Schema.Attribute.CustomField<
+        'plugin::superfields.tooltip-number-field',
+        {
+          description: 'Use as setas para Cima/Baixo para escolher o Andar';
+          numberType: 'Integer';
+        }
+      > &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true;
         };
-      }>;
+      }> &
+      Schema.Attribute.DefaultTo<0>;
     Ano_de_Construcao: Schema.Attribute.Date &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
@@ -501,6 +509,18 @@ export interface ApiAnuncioAnuncio extends Struct.CollectionTypeSchema {
         };
       }>;
     author: Schema.Attribute.Relation<'oneToOne', 'api::author.author'>;
+    Bairro: Schema.Attribute.String &
+      Schema.Attribute.CustomField<
+        'plugin::superfields.tooltip-field',
+        {
+          description: 'Digite a regi\u00E3o do im\u00F3vel';
+        }
+      > &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
     Condominio: Schema.Attribute.String &
       Schema.Attribute.CustomField<
         'plugin::superfields.tooltip-field',
@@ -532,12 +552,53 @@ export interface ApiAnuncioAnuncio extends Struct.CollectionTypeSchema {
           localized: true;
         };
       }>;
+    IPTU: Schema.Attribute.String &
+      Schema.Attribute.CustomField<
+        'plugin::superfields.tooltip-field',
+        {
+          default: '0';
+          description: 'Digite Somente o Valor do IPTU (Sem o R$)';
+        }
+      > &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
     locale: Schema.Attribute.String;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
       'api::anuncio.anuncio'
     >;
     publishedAt: Schema.Attribute.DateTime;
+    Quartos: Schema.Attribute.Integer &
+      Schema.Attribute.CustomField<
+        'plugin::superfields.tooltip-number-field',
+        {
+          description: 'Use as setas para Cima/Baixo para escolher a quantidade de Quartos';
+          numberType: 'Integer';
+        }
+      > &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }> &
+      Schema.Attribute.DefaultTo<0>;
+    Suites: Schema.Attribute.Integer &
+      Schema.Attribute.CustomField<
+        'plugin::superfields.tooltip-number-field',
+        {
+          description: 'Use as setas para Cima/Baixo para escolher a quantidade de Su\u00EDtes';
+          numberType: 'Integer';
+        }
+      > &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }> &
+      Schema.Attribute.DefaultTo<0>;
     Tipo_de_Anuncio: Schema.Attribute.String &
       Schema.Attribute.CustomField<
         'plugin::superfields.tooltip-enum-field',
@@ -575,6 +636,32 @@ export interface ApiAnuncioAnuncio extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    Valor_Aluguel: Schema.Attribute.String &
+      Schema.Attribute.CustomField<
+        'plugin::superfields.tooltip-field',
+        {
+          description: 'Digite Somente o Valor do Aluguel (sem o R$)';
+          'tooltip-content': '';
+        }
+      > &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    Valor_Venda: Schema.Attribute.String &
+      Schema.Attribute.CustomField<
+        'plugin::superfields.tooltip-field',
+        {
+          description: 'Digite Somente o Valor da Venda (sem o R$)';
+          'tooltip-content': '';
+        }
+      > &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
   };
 }
 
