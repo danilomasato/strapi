@@ -31,7 +31,7 @@ div.sc-beySbL.ceLAnO.sc-guDLRU.jfNlOw > div > div > div:nth-child(1) > div:nth-c
 
 }
 
-aside[aria-labelledby="additional-information"]:nth-child(2) {
+#main-content aside:nth-child(2) {
     display: none !important;
 }
 
@@ -56,15 +56,5 @@ aside[aria-labelledby="additional-information"]:nth-child(2) {
 
 #main-content div[role="tablist"] > button:nth-child(2) > span::after {
     content: 'Publicado';
-    visibility: visible;
-}
-
-#main-content h1 {
-    visibility: hidden;
-    text-indent: -190px;
-}
-
-#main-content h1::after {
-    content: 'Criar novo anúncio';
     visibility: visible;
 }
