@@ -88,7 +88,7 @@ export default {
           "HomePage.header.subtitle": "Bem-vindo ao seu painel de administração.",
           "HomePage.header.title": "Pagina inicial",
           "Auth.form.welcome.title": "Painel ADM TSA Imóveis",
-          'Auth.form.welcome.subtitle': 'Faça login para gerenciar o conteúdo',
+          'Auth.form.welcome.subtitle': 'Acesso para Corretores',
            "content-manager.containers.Edit.submit.draft": "Salvar Alterações",
            // Altera o texto da aba (Tab) no topo da página de edição
         "content-manager.containers.Edit.tabs.draft": "Em Edição",
