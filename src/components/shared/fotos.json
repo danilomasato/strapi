@@ -1,0 +1,26 @@
+{
+  "collectionName": "components_shared_fotos",
+  "info": {
+    "displayName": "Fotos",
+    "icon": "picture"
+  },
+  "options": {},
+  "attributes": {
+    "fotos": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "author": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::author.author"
+    }
+  },
+  "config": {}
+}
