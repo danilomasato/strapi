@@ -543,7 +543,10 @@ export interface ApiAnuncioAnuncio extends Struct.CollectionTypeSchema {
           localized: true;
         };
       }>;
-    galeria: Schema.Attribute.Component<'shared.fotos', false> &
+    Fotos: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios',
+      true
+    > &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true;

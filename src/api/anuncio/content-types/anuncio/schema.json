@@ -37,15 +37,20 @@
       "target": "api::author.author",
       "inversedBy": "anuncio"
     },
-    "galeria": {
-      "type": "component",
+    "Fotos": {
+      "type": "media",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
       },
-      "component": "shared.fotos",
-      "repeatable": false
+      "multiple": true,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
     },
     "Andar": {
       "type": "customField",
