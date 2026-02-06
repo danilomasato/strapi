@@ -7,6 +7,8 @@ export default {
     locales: ['pt-BR'],
     translations: {
       "pt-BR": {
+          "upload.header.actions.add-assets": "Carregar novo arquivo",
+          "upload.header.actions.create-folder": "Criar pasta personalizada",
           "Files Upload": "Enviar arquivos",
           "app.utils.unpublish": "Inativar",
           "app.utils.published": "Publicado",
