@@ -7,8 +7,15 @@ export default {
     locales: ['pt-BR'],
     translations: {
       "pt-BR": {
-          "upload.header.actions.add-assets": "Carregar novo arquivo",
-          "upload.header.actions.create-folder": "Criar pasta personalizada",
+         // Botão na Galeria Principal
+        'upload.control-utils.add-folder': 'Criar Pasta',
+        
+        // Botão dentro do Modal de Seleção (Asset Picker)
+        'upload.header.actions.add-folder': 'Nova Pasta',
+        
+        // Chave específica para componentes de "Múltiplas Fotos"
+        'upload.modal.header.browse': 'Navegar por fotos',
+        'upload.modal.header.select-files': 'Selecionar arquivos',
           "Files Upload": "Enviar arquivos",
           "app.utils.unpublish": "Inativar",
           "app.utils.published": "Publicado",
@@ -108,5 +115,23 @@ export default {
   },
   bootstrap(app) {
     console.log('Admin inicializado com novas traduções');
+
+    // Injeção de CSS via JavaScript para garantir que sobrescreva o componente React
+    const style = document.createElement('style');
+    style.innerHTML = `
+      /* Alvos: Botão na Galeria e no Modal de Múltipla Escolha */
+      div[role="dialog"] div > div > div:nth-child(2) > button:nth-child(1) {
+          text-indent: -99999px;
+      }
+
+      div[role="dialog"] div > div > div:nth-child(2) > button:nth-child(1)::after {
+          content: "ADICIONAR PASTA" !important; /* TEXTO QUE VOCÊ QUER */
+          font-size: 12px !important;
+          font-weight: 600 !important;
+          text-transform: none !important;
+          text-indent: 0;
+      }
+    `;
+    document.head.appendChild(style);
   },
 };

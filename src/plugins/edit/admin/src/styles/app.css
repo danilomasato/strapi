@@ -30,15 +30,3 @@
 #main-content span input {
     color: #000 !important;
 }
-
-/* div[role="dialog"] div > div > div:nth-child(2) > button:nth-child(1) {
-    text-indent: -99999px;
-}
-
-div[role="dialog"] div > div > div:nth-child(2) > button:nth-child(1)::after {
-    content: "ADICIONAR PASTA" !important; /* TEXTO QUE VOCÊ QUER */
-    font-size: 12px !important;
-    font-weight: 600 !important;
-    text-transform: none !important;
-    text-indent: 0;
-} */
