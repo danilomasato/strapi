@@ -119,6 +119,22 @@ export default {
     // Injeção de CSS via JavaScript para garantir que sobrescreva o componente React
     const style = document.createElement('style');
     style.innerHTML = `
+      html, body, div, span, applet, object, iframe,
+      h3, h4, h5, h6, p, blockquote, pre,
+      a, abbr, acronym, address, big, cite, code,
+      del, dfn, em, img, ins, kbd, q, s, samp,
+      small, strike, strong, sub, sup, tt, var,
+      b, u, i, center,
+      dl, dt, dd, ol, ul, li,
+      fieldset, form, label, legend,
+      table, caption, tbody, tfoot, thead, tr, th, td,
+      article, aside, canvas, details, embed, 
+      figure, figcaption, footer, header, hgroup, 
+      menu, nav, output, ruby, section, summary,
+      time, mark, audio, video {
+        font-size: 0.95rem !important;
+      }
+
       /* Alvos: Botão na Galeria e no Modal de Múltipla Escolha */
       div[role="dialog"] div > div > div:nth-child(2) > button:nth-child(1) {
           text-indent: -99999px;
@@ -131,26 +147,72 @@ export default {
           text-transform: none !important;
           text-indent: 0;
       }
+      
+      #main-content > form h1 {
+          position: relative;
+          color: #000 !important;
+          text-indent: -99999px;
+      }
+
+      #main-content > form h1::after {
+        font-size: 2rem;
+        position: absolute;
+        left: 0;
+        text-indent: 0;
+        content: "Anúncio" !important; /* TEXTO QUE VOCÊ QUER */
+    }
+
+      #main-content aside:nth-child(2) {
+          display: none !important;
+      }
+
+      #main-content div[role="tablist"] > button > span:nth-child(1) {
+          visibility: hidden;
+          text-indent: -190px;
+      }
+
+      #main-content div[role="tablist"] > button > span:nth-child(1)::after {
+          content: 'Rascunho';
+          visibility: visible;
+      }
+
+      #main-content div[role="tablist"] > button:nth-child(2) > span {
+          visibility: hidden;
+          text-indent: -190px;
+      }
+
+      #main-content div[role="tablist"] > button:nth-child(2) > span::after {
+          content: 'Publicado';
+          visibility: visible;
+      }
+
+      #main-content span input {
+          color: #000 !important;
+      }
+
+      /* div[role="dialog"] div > div > div:nth-child(2) > button:nth-child(1) {
+          text-indent: -99999px;
+      }
+
     `;
     document.head.appendChild(style);
-    function docReady(fn) {
-    // see if DOM is already available
-        if (document.readyState === "complete" || document.readyState === "interactive") {
-            // call on next available tick
-            setTimeout(fn, 3500);
-        } else {
-            document.addEventListener("DOMContentLoaded", fn);
-        }
-    }    
-    Usage:
+    // function docReady(fn) {
+    // // see if DOM is already available
+    //     if (document.readyState === "complete" || document.readyState === "interactive") {
+    //         // call on next available tick
+    //         setTimeout(fn, 6000);
+    //     } else {
+    //         document.addEventListener("DOMContentLoaded", fn);
+    //     }
+    // }    
 
-    docReady(function() {
-       var title = document.querySelector('h1')
+    // docReady(function() {
+    //    var title = document.querySelector('h1')
 
-       if(title.innerHTML.includes('Create an entry')){
-        title.innerHTML = 'Criar Novo Anúncio';
-       }
-    });
+    //    if(title.innerHTML.includes('Create an entry')){
+    //     title.innerHTML = 'Criar Novo Anúncio';
+    //    }
+    // });
     
   },
 };
