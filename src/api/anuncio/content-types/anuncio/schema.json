@@ -75,7 +75,7 @@
       },
       "customField": "plugin::superfields.tooltip-enum-field",
       "options": {
-        "enumValues": "venda\naluguel\nvenda e aluguel",
+        "enumValues": "venda\naluguel\nvenda e aluguel\nLançamentos",
         "description": "Selecione o tipo de anuncio",
         "tooltip-content": "Selecione o tipo de anuncio"
       }
