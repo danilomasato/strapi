@@ -125,7 +125,7 @@ export default {
       }
 
       div[role="dialog"] div > div > div:nth-child(2) > button:nth-child(1)::after {
-          content: "ADICIONAR PASTA" !important; /* TEXTO QUE VOCÊ QUER */
+          content: "Criar PASTA" !important; /* TEXTO QUE VOCÊ QUER */
           font-size: 12px !important;
           font-weight: 600 !important;
           text-transform: none !important;
@@ -133,5 +133,24 @@ export default {
       }
     `;
     document.head.appendChild(style);
+    function docReady(fn) {
+    // see if DOM is already available
+        if (document.readyState === "complete" || document.readyState === "interactive") {
+            // call on next available tick
+            setTimeout(fn, 3500);
+        } else {
+            document.addEventListener("DOMContentLoaded", fn);
+        }
+    }    
+    Usage:
+
+    docReady(function() {
+       var title = document.querySelector('h1')
+
+       if(title.innerHTML.includes('Create an entry')){
+        title.innerHTML = 'Criar Novo Anúncio';
+       }
+    });
+    
   },
 };
