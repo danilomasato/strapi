@@ -37,21 +37,6 @@
       "target": "api::author.author",
       "inversedBy": "anuncio"
     },
-    "Fotos": {
-      "type": "media",
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
-      "multiple": true,
-      "allowedTypes": [
-        "images",
-        "files",
-        "videos",
-        "audios"
-      ]
-    },
     "Andar": {
       "type": "customField",
       "pluginOptions": {
@@ -206,6 +191,21 @@
         "description": "Digite Somente o Valor do IPTU (Sem o R$)",
         "default": "0"
       }
+    },
+    "Fotos": {
+      "type": "media",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "multiple": true,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
     }
   }
 }

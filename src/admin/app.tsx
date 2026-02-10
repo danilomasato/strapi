@@ -257,7 +257,7 @@ export default {
         text-indent: 0;
       }
 
-      #main-content div[aria-describedby] {
+      #main-content span[aria-live="assertive"] + div[aria-describedby] {
         height: 300px;
       }
 
