@@ -231,6 +231,10 @@ export default {
         display: none !important;
       }
 
+      div[role="dialog"] form[method="POST"] > div > div > div > div > div:nth-child(2) {
+        display: block !important;
+      }
+
       div[data-state="open"] form > header h2 {
         content: '';
         margin-left: -240px;
