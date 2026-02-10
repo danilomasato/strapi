@@ -141,7 +141,7 @@ export default {
       }
 
       div[role="dialog"] div > div > div:nth-child(2) > button:nth-child(1)::after {
-          content: "Criar PASTA" !important; /* TEXTO QUE VOCÊ QUER */
+          content: "Criar Pasta" !important; /* TEXTO QUE VOCÊ QUER */
           font-size: 12px !important;
           font-weight: 600 !important;
           text-transform: none !important;
@@ -190,9 +190,35 @@ export default {
           color: #000 !important;
       }
 
-      /* div[role="dialog"] div > div > div:nth-child(2) > button:nth-child(1) {
+      div[role="dialog"] div > div > div:nth-child(2) > button:nth-child(1) {
           text-indent: -99999px;
       }
+
+      nav[aria-label="Conteúdo"] ul li:nth-child(1) span {
+        visibility: hidden;
+        text-indent: -999px;
+        margin-left: -100px;
+      }
+
+      nav[aria-label="Conteúdo"] ul li:nth-child(1) span::after {
+      content: 'Gerenciador de Conteúdo';
+          visibility: visible;
+      }
+
+      nav:nth-child(1) ul > li:nth-child(2) > div > span a {
+        display: block;
+        height: 50px;
+        width: 50px;
+        padding: 0;
+        background: url('https://img.freepik.com/vetores-premium/o-icone-da-casa-o-tema-do-aluguel-e-venda-de-imoveis_667176-70.jpg');
+        background-size: cover;
+      }
+
+      nav:nth-child(1) ul > li:nth-child(2) > div > span svg {
+        display: none !important;
+      }
+
+
 
     `;
     document.head.appendChild(style);
