@@ -604,7 +604,7 @@ export interface ApiAnuncioAnuncio extends Struct.CollectionTypeSchema {
         'plugin::superfields.tooltip-enum-field',
         {
           description: 'Selecione o tipo de anuncio';
-          enumValues: 'venda\naluguel\nvenda e aluguel';
+          enumValues: 'venda\naluguel\nvenda e aluguel\nLan\u00E7amentos';
           'tooltip-content': 'Selecione o tipo de anuncio';
         }
       > &

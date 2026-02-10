@@ -257,6 +257,10 @@ export default {
         text-indent: 0;
       }
 
+      #main-content div[aria-describedby] {
+        height: 300px;
+      }
+
     `;
     document.head.appendChild(style);
     function docReady(fn) {
