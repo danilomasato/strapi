@@ -218,27 +218,60 @@ export default {
         display: none !important;
       }
 
+      // div[role="dialog"] header h2 {
+      //   text-indent: -999px;
+      // }
 
+      // div[role="dialog"] header h2::after {
+      //   content: 'Gerenciador de Conteúdo';
+      //   text-indent: 0;
+      // }
+
+      div[role="dialog"] form > div > div > div > div > div:nth-child(2) {
+        display: none !important;
+      }
+
+      div[data-state="open"] form > header h2 {
+        content: '';
+        margin-left: -240px;
+      }
+
+      div[data-state="open"] form > header h2::after {
+        content: 'Adiocionar mídia';
+        text-indent: 0;
+        margin-left: 100px;
+      }
+
+      div[role="dialog"] form > footer > div > button {
+        text-indent: -999px;
+        margin-left: -100px;
+      }
+      
+      div[role="dialog"] form > footer > div > button::after {
+        content: 'Criar Pasta';
+        visibility: visible;
+        text-indent: 0;
+      }
 
     `;
     document.head.appendChild(style);
-    // function docReady(fn) {
-    // // see if DOM is already available
-    //     if (document.readyState === "complete" || document.readyState === "interactive") {
-    //         // call on next available tick
-    //         setTimeout(fn, 6000);
-    //     } else {
-    //         document.addEventListener("DOMContentLoaded", fn);
-    //     }
-    // }    
+    function docReady(fn) {
+    // see if DOM is already available
+        if (document.readyState === "complete" || document.readyState === "interactive") {
+            // call on next available tick
+            setTimeout(fn, 6000);
+        } else {
+            document.addEventListener("DOMContentLoaded", fn);
+        }
+    }    
 
-    // docReady(function() {
-    //    var title = document.querySelector('h1')
+    docReady(function() {
+       var title = document.querySelector('h1')
 
-    //    if(title.innerHTML.includes('Create an entry')){
-    //     title.innerHTML = 'Criar Novo Anúncio';
-    //    }
-    // });
+       if(title.innerHTML.includes('Create an entry')){
+        title.innerHTML = 'Criar Novo Anúncio';
+       }
+    });
     
   },
 };
