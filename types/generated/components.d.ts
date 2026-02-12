@@ -7,7 +7,6 @@ export interface SharedFotos extends Struct.ComponentSchema {
     icon: 'picture';
   };
   attributes: {
-    author: Schema.Attribute.Relation<'oneToOne', 'api::author.author'>;
     fotos: Schema.Attribute.Media<
       'images' | 'files' | 'videos' | 'audios',
       true

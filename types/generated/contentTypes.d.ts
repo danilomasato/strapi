@@ -508,7 +508,6 @@ export interface ApiAnuncioAnuncio extends Struct.CollectionTypeSchema {
           localized: true;
         };
       }>;
-    author: Schema.Attribute.Relation<'oneToOne', 'api::author.author'>;
     Bairro: Schema.Attribute.String &
       Schema.Attribute.CustomField<
         'plugin::superfields.tooltip-field',
@@ -636,6 +635,19 @@ export interface ApiAnuncioAnuncio extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    Vagas: Schema.Attribute.Integer &
+      Schema.Attribute.CustomField<
+        'plugin::superfields.tooltip-number-field',
+        {
+          description: 'Use as setas para Cima/Baixo para escolher o numero de Vagas';
+          numberType: 'Integer';
+        }
+      > &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
     Valor_Aluguel: Schema.Attribute.String &
       Schema.Attribute.CustomField<
         'plugin::superfields.tooltip-field',
@@ -807,39 +819,6 @@ export interface ApiArticleArticle extends Struct.CollectionTypeSchema {
           localized: true;
         };
       }>;
-  };
-}
-
-export interface ApiAuthorAuthor extends Struct.CollectionTypeSchema {
-  collectionName: 'authors';
-  info: {
-    description: 'Create authors for your content';
-    displayName: 'Author';
-    pluralName: 'authors';
-    singularName: 'author';
-  };
-  options: {
-    draftAndPublish: false;
-  };
-  attributes: {
-    anuncio: Schema.Attribute.Relation<'oneToOne', 'api::anuncio.anuncio'>;
-    avatar: Schema.Attribute.Media<'images' | 'files' | 'videos'>;
-    contato: Schema.Attribute.BigInteger;
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    email: Schema.Attribute.String;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::author.author'
-    > &
-      Schema.Attribute.Private;
-    name: Schema.Attribute.String;
-    publishedAt: Schema.Attribute.DateTime;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
   };
 }
 
@@ -1450,7 +1429,6 @@ declare module '@strapi/strapi' {
       'api::about.about': ApiAboutAbout;
       'api::anuncio.anuncio': ApiAnuncioAnuncio;
       'api::article.article': ApiArticleArticle;
-      'api::author.author': ApiAuthorAuthor;
       'api::global.global': ApiGlobalGlobal;
       'api::tipo.tipo': ApiTipoTipo;
       'plugin::content-releases.release': PluginContentReleasesRelease;

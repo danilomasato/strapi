@@ -31,12 +31,6 @@
         }
       }
     },
-    "author": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::author.author",
-      "inversedBy": "anuncio"
-    },
     "Andar": {
       "type": "customField",
       "pluginOptions": {
@@ -206,6 +200,19 @@
         "videos",
         "audios"
       ]
+    },
+    "Vagas": {
+      "type": "customField",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "customField": "plugin::superfields.tooltip-number-field",
+      "options": {
+        "numberType": "Integer",
+        "description": "Use as setas para Cima/Baixo para escolher o numero de Vagas"
+      }
     }
   }
 }
