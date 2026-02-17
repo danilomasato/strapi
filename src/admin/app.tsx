@@ -119,22 +119,6 @@ export default {
     // Injeção de CSS via JavaScript para garantir que sobrescreva o componente React
     const style = document.createElement('style');
     style.innerHTML = `
-      html, body, div, span, applet, object, iframe,
-      h3, h4, h5, h6, p, blockquote, pre,
-      a, abbr, acronym, address, big, cite, code,
-      del, dfn, em, img, ins, kbd, q, s, samp,
-      small, strike, strong, sub, sup, tt, var,
-      b, u, i, center,
-      dl, dt, dd, ol, ul, li,
-      fieldset, form, label, legend,
-      table, caption, tbody, tfoot, thead, tr, th, td,
-      article, aside, canvas, details, embed, 
-      figure, figcaption, footer, header, hgroup, 
-      menu, nav, output, ruby, section, summary,
-      time, mark, audio, video {
-        font-size: 0.95rem !important;
-      }
-
       /* Alvos: Botão na Galeria e no Modal de Múltipla Escolha */
       div[role="dialog"] div > div > div:nth-child(2) > button:nth-child(1) {
           text-indent: -99999px;

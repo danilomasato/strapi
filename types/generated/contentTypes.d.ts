@@ -520,6 +520,19 @@ export interface ApiAnuncioAnuncio extends Struct.CollectionTypeSchema {
           localized: true;
         };
       }>;
+    Banheiros: Schema.Attribute.Integer &
+      Schema.Attribute.CustomField<
+        'plugin::superfields.tooltip-number-field',
+        {
+          description: 'Use as setas para Cima/Baixo para escolher a quantidade de Su\u00EDtes';
+          numberType: 'Integer';
+        }
+      > &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
     Condominio: Schema.Attribute.String &
       Schema.Attribute.CustomField<
         'plugin::superfields.tooltip-field',
