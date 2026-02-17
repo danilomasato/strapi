@@ -213,6 +213,19 @@
         "numberType": "Integer",
         "description": "Use as setas para Cima/Baixo para escolher o numero de Vagas"
       }
+    },
+    "Banheiros": {
+      "type": "customField",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "customField": "plugin::superfields.tooltip-number-field",
+      "options": {
+        "numberType": "Integer",
+        "description": "Use as setas para Cima/Baixo para escolher a quantidade de Suítes"
+      }
     }
   }
 }
