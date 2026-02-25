@@ -132,7 +132,6 @@ export default {
       figure, figcaption, footer, header, hgroup, 
       menu, nav, output, ruby, section, summary,
       time, mark, audio, video {
-        font-size: 0.95rem !important;
         ol, ul 
         list-style: none;
         padding: unset;
