@@ -137,8 +137,13 @@ export default {
         padding: unset;
         margin: unset;
       }
-
-      font-size: initial !important;
+      html, body {
+        font-size: initial !important;
+        font-family: 'Inter';
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+      }
 
       /* Alvos: Botão na Galeria e no Modal de Múltipla Escolha */
       div[role="dialog"] div > div > div:nth-child(2) > button:nth-child(1) {
