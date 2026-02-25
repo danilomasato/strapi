@@ -138,7 +138,6 @@ export default {
         margin: unset;
       }
       html, body {
-        font-size: initial !important;
         font-family: 'Inter';
         font-size: 62.5%;
       }
