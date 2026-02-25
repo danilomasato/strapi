@@ -140,9 +140,7 @@ export default {
       html, body {
         font-size: initial !important;
         font-family: 'Inter';
-        font-style: normal;
-        font-weight: 400;
-        font-display: swap;
+        font-size: 62.5%;
       }
 
       /* Alvos: Botão na Galeria e no Modal de Múltipla Escolha */
