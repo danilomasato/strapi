@@ -104,6 +104,9 @@ export default {
         
         // Altera o badge de status no cabeçalho (HeaderLayout)
         "content-manager.HeaderLayout.status.draft": "Rascunho",
+        "app.components.HomePage.lastEditedEntries": "Atividade Recente",
+        "HomePage.last-edited-entries": "Atividade Recente",
+        "content-manager.containers.HomePage.last-edited-entries": "Atividade Recente",
         
         // Altera o botão de salvar rascunho
         "content-manager.containers.Edit.submit.draft": "Salvar Alterações",
@@ -142,9 +145,29 @@ export default {
         font-size: 62.5%;
       }
 
+      #main-content section[data-strapi-widget-id="plugin::content-manager.last-edited-entries"] svg + h2 {
+        visibility: hidden;
+      }
+
+      #main-content section[data-strapi-widget-id="plugin::content-manager.last-edited-entries"] svg + h2::before {
+        content: "Atividades Recentes";
+        visibility: visible;
+      }
+
+      #main-content section[data-strapi-widget-id="plugin::content-manager.last-published-entries"] svg + h2 {
+        visibility: hidden;
+      }
+
+      #main-content section[data-strapi-widget-id="plugin::content-manager.last-published-entries"] svg + h2::before {
+        content: "Últimas publicações";
+        visibility: visible;
+      }
+
+      Últimas publicações
+
       /* Alvos: Botão na Galeria e no Modal de Múltipla Escolha */
-      div[role="dialog"] div > div > div:nth-child(2) > button:nth-child(1) {
-          text-indent: -99999px;
+      div[role="dialog"] div > div > div:nth-child(2) > button {
+        text-indent: -99999px;
       }
 
       div[role="dialog"] div > div > div:nth-child(2) > button:nth-child(1)::after {
