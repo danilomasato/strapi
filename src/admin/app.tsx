@@ -169,7 +169,7 @@ export default {
         display: none;
       }
 
-      #strapi div[data-orientation="horizontal"] + div > ul > li:nth-child(2) div svg {
+      #strapi div[data-orientation="horizontal"] + div > ul > li:nth-child(2) svg {
         width: 20px;
         height: 20px;
         background-size: contain;  
@@ -250,28 +250,6 @@ export default {
       content: 'Gerenciador de Conteúdo';
           visibility: visible;
       }
-      
-      nav:nth-child(1) ul > li:nth-child(2) span a {
-        display: block;
-        height: 50px;
-        width: 50px;
-        padding: 0;
-        background: url('https://img.freepik.com/vetores-premium/o-icone-da-casa-o-tema-do-aluguel-e-venda-de-imoveis_667176-70.jpg');
-        background-size: cover;
-      }
-
-      nav:nth-child(1) ul > li:nth-child(2) > div > span svg {
-        display: none !important;
-      }
-
-      // div[role="dialog"] header h2 {
-      //   text-indent: -999px;
-      // }
-
-      // div[role="dialog"] header h2::after {
-      //   content: 'Gerenciador de Conteúdo';
-      //   text-indent: 0;
-      // }
 
       div[role="dialog"] form > div > div > div > div > div:nth-child(2) {
         display: none !important;
