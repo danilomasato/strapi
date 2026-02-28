@@ -250,8 +250,8 @@ export default {
       content: 'Gerenciador de Conteúdo';
           visibility: visible;
       }
-
-      nav:nth-child(1) ul > li:nth-child(2) > div > span a {
+      
+      nav:nth-child(1) ul > li:nth-child(2) span a {
         display: block;
         height: 50px;
         width: 50px;
