@@ -163,7 +163,18 @@ export default {
         visibility: visible;
       }
 
-      Últimas publicações
+      #strapi div[data-orientation="horizontal"] + div > ul > li:nth-child(1),
+      #main-content div:nth-child(2) > div button:nth-child(2),
+      #strapi div[data-orientation="horizontal"] + div > ul > li:nth-child(2) svg path  {
+        display: none;
+      }
+
+      #strapi div[data-orientation="horizontal"] + div > ul > li:nth-child(2) div svg {
+        width: 20px;
+        height: 20px;
+        background-size: contain;  
+        background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="20" height="20" fill="%238e8ea9" aria-hidden="true" focusable="false"><path d="M28 14.444V26a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V14.444a2 2 0 0 1 .646-1.473l10-9.435.014-.013a2 2 0 0 1 2.705.013l10 9.435A2 2 0 0 1 28 14.444"></path></svg>')
+      }
 
       /* Alvos: Botão na Galeria e no Modal de Múltipla Escolha */
       div[role="dialog"] div > div > div:nth-child(2) > button {
