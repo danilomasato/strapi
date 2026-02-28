@@ -170,6 +170,11 @@ export default {
         text-indent: -99999px;
       }
 
+      #main-content > div:nth-child(1) > div > div > div > div button,
+      #main-content section[plugin::admin.profile-info"] {
+        display: none;
+      }
+
       div[role="dialog"] div > div > div:nth-child(2) > button:nth-child(1)::after {
           content: "Criar Pasta" !important; /* TEXTO QUE VOCÊ QUER */
           font-size: 12px !important;
