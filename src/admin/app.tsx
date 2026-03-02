@@ -139,6 +139,7 @@ export default {
         padding: unset;
         margin: unset;
         list-style: none;
+        font-family: system-ui;
       }
       html, body {
         font-family: 'Inter';
