@@ -139,10 +139,10 @@ export default {
         padding: unset;
         margin: unset;
         list-style: none;
-        font-family: system-ui;
       }
+
       html, body {
-        font-family: 'Inter';
+        font-family: system-ui;
         font-size: 62.5%;
       }
 
