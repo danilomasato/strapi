@@ -165,7 +165,8 @@ export default {
 
       #strapi div[data-orientation="horizontal"] + div > ul > li:nth-child(1),
       #main-content div:nth-child(2) > div button:nth-child(2),
-      #strapi div[data-orientation="horizontal"] + div > ul > li:nth-child(2) svg path  {
+      #strapi div[data-orientation="horizontal"] + div > ul > li:nth-child(2) svg path,
+      main[aria-labelledby="main-content-title"] button  {
         display: none;
       }
 
@@ -176,7 +177,24 @@ export default {
         background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="20" height="20" fill="%238e8ea9" aria-hidden="true" focusable="false"><path d="M28 14.444V26a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V14.444a2 2 0 0 1 .646-1.473l10-9.435.014-.013a2 2 0 0 1 2.705.013l10 9.435A2 2 0 0 1 28 14.444"></path></svg>')
       }
 
-      /* Alvos: Botão na Galeria e no Modal de Múltipla Escolha */
+      section[aria-labelledby="plugin::admin.profile-info"] header > div + a {
+        visibility: hidden;
+      }
+
+      section[aria-labelledby="plugin::admin.profile-info"] header > div + a::after {
+        content: "Configurações de perfil";
+        visibility: visible;
+      }
+
+      section[aria-labelledby="plugin::admin.profile-info"] header > div h2 {
+        visibility: hidden;
+      }
+
+      section[aria-labelledby="plugin::admin.profile-info"] header > div h2::before {
+        content: "Perfil";
+        visibility: visible;
+      }
+
       div[role="dialog"] div > div > div:nth-child(2) > button {
         text-indent: -99999px;
       }
@@ -284,7 +302,6 @@ export default {
       #main-content span[aria-live="assertive"] + div[aria-describedby] {
         height: 300px;
       }
-
     `;
     document.head.appendChild(style);
     function docReady(fn) {
