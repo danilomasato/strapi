@@ -113,6 +113,7 @@ export default {
         
         // Altera o status na lista geral (List View)
         "content-manager.utils.data-status.draft": "Rascunho",
+       "content-manager.pages.ListView.header-subtitle": "{number, plural, =0 {Nenhum Imóvel} one {# Imóvel encontrado} other {# Imóveis encontrados}}"
       },
     },
   },
@@ -135,10 +136,9 @@ export default {
       figure, figcaption, footer, header, hgroup, 
       menu, nav, output, ruby, section, summary,
       time, mark, audio, video {
-        ol, ul 
-        list-style: none;
         padding: unset;
         margin: unset;
+        list-style: none;
       }
       html, body {
         font-family: 'Inter';
@@ -166,7 +166,9 @@ export default {
       #strapi div[data-orientation="horizontal"] + div > ul > li:nth-child(1),
       #main-content div:nth-child(2) > div button:nth-child(2),
       #strapi div[data-orientation="horizontal"] + div > ul > li:nth-child(2) svg path,
-      main[aria-labelledby="main-content-title"] button  {
+      #main-content div[data-strapi-header] > div > div button,
+      div[data-radix-scroll-area-viewport] > div > div:nth-child(2) > ul > li:nth-child(1) > div > div > div > div:nth-child(2),
+      div[data-radix-scroll-area-viewport] > div > div:nth-child(2) > ul > li:nth-child(2) {
         display: none;
       }
 
@@ -174,7 +176,7 @@ export default {
         width: 20px;
         height: 20px;
         background-size: contain;  
-        background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="20" height="20" fill="%238e8ea9" aria-hidden="true" focusable="false"><path d="M28 14.444V26a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V14.444a2 2 0 0 1 .646-1.473l10-9.435.014-.013a2 2 0 0 1 2.705.013l10 9.435A2 2 0 0 1 28 14.444"></path></svg>')
+        background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="20" height="20" fill="%238e8ea9" aria-hidden="true" focusable="false"><path d="M28 14.444V26a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V14.444a2 2 0 0 1 .646-1.473l10-9.435.014-.013a2 2 0 0 1 2.705.013l10 9.435A2 2 0 0 1 28 14.444"></path></svg>');
       }
 
       section[aria-labelledby="plugin::admin.profile-info"] header > div + a {
@@ -199,13 +201,8 @@ export default {
         text-indent: -99999px;
       }
 
-      #main-content > div:nth-child(1) > div > div > div > div button,
-      #main-content section[plugin::admin.profile-info"] {
-        display: none;
-      }
-
       div[role="dialog"] div > div > div:nth-child(2) > button:nth-child(1)::after {
-          content: "Criar Pasta" !important; /* TEXTO QUE VOCÊ QUER */
+          content: "Criar Pasta" !important;
           font-size: 12px !important;
           font-weight: 600 !important;
           text-transform: none !important;
@@ -223,8 +220,8 @@ export default {
         position: absolute;
         left: 0;
         text-indent: 0;
-        content: "Anúncio" !important; /* TEXTO QUE VOCÊ QUER */
-    }
+        content: "Anúncio" !important;
+      }
 
       #main-content aside:nth-child(2) {
           display: none !important;
@@ -260,13 +257,16 @@ export default {
 
       nav[aria-label="Conteúdo"] ul li:nth-child(1) span {
         visibility: hidden;
-        text-indent: -999px;
-        margin-left: -100px;
+        font-size: 0;
       }
 
-      nav[aria-label="Conteúdo"] ul li:nth-child(1) span::after {
-      content: 'Gerenciador de Conteúdo';
-          visibility: visible;
+      nav[aria-label="Conteúdo"] ul li:nth-child(1) span::before {
+        content: 'Gerenciador de Conteúdo';
+        visibility: visible;
+        font-size: 1.1rem;
+        font-weight: bold;
+        margin-top: 10px;
+        display: block;
       }
 
       div[role="dialog"] form > div > div > div > div > div:nth-child(2) {
@@ -301,6 +301,11 @@ export default {
 
       #main-content span[aria-live="assertive"] + div[aria-describedby] {
         height: 300px;
+      }
+
+      #main-content > div:nth-child(1) > div > div > div > div button,
+      #main-content section[plugin::admin.profile-info"] {
+        display: none;
       }
     `;
     document.head.appendChild(style);
