@@ -165,7 +165,7 @@ export default {
       }
 
       #strapi div[data-orientation="horizontal"] + div > ul > li:nth-child(1),
-      #main-content div:nth-child(2) > div button:nth-child(2),
+      main[aria-labelledby="main-content-title"] div:nth-child(2) > div button[aria-haspopup="dialog"]:nth-child(2),
       #strapi div[data-orientation="horizontal"] + div > ul > li:nth-child(2) svg path,
       #main-content div[data-strapi-header] > div > div button,
       div[data-radix-scroll-area-viewport] > div > div:nth-child(2) > ul > li:nth-child(1) > div > div > div > div:nth-child(2),
