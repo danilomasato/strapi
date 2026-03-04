@@ -169,7 +169,9 @@ export default {
       #strapi div[data-orientation="horizontal"] + div > ul > li:nth-child(2) svg path,
       #main-content div[data-strapi-header] > div > div button,
       div[data-radix-scroll-area-viewport] > div > div:nth-child(2) > ul > li:nth-child(1) > div > div > div > div:nth-child(2),
-      div[data-radix-scroll-area-viewport] > div > div:nth-child(2) > ul > li:nth-child(2) {
+      div[data-radix-scroll-area-viewport] > div > div:nth-child(2) > ul > li:nth-child(2),
+      nav[aria-label="Configurações"]
+       {
         display: none;
       }
 
@@ -304,8 +306,19 @@ export default {
         height: 300px;
       }
 
+      #main-content > div:nth-child(1) > div > div > div > div > button {
+        display: block;
+      }
+       
+      #main-content > form > div:nth-child(1) > div > div > div > div > button span,
+      #main-content > div:nth-child(1) > div > div > div > div > button span {
+        float: left;
+        margin-right: 5px;
+      }
+
       #main-content > div:nth-child(1) > div > div > div > div button,
-      #main-content section[plugin::admin.profile-info"] {
+      #main-content section[plugin::admin.profile-info"],
+      section[aria-labelledby="plugin::content-manager.chart-entries"]{
         display: none;
       }
     `;
@@ -314,7 +327,7 @@ export default {
     // see if DOM is already available
         if (document.readyState === "complete" || document.readyState === "interactive") {
             // call on next available tick
-            setTimeout(fn, 6000);
+            setTimeout(fn, 4000);
         } else {
             document.addEventListener("DOMContentLoaded", fn);
         }
@@ -326,7 +339,48 @@ export default {
        if(title.innerHTML.includes('Create an entry')){
         title.innerHTML = 'Criar Novo Anúncio';
        }
-    });
+       
+
+      let invite = document.createElement("li");
+
+       const contentInvite =`
+          <div><span data-state="closed">
+            <a aria-label="Adicionar Corretor" class="sc-bgylsh sc-eFtBSE lizKBy bltvKm" href="http://localhost:1337/admin/settings/users?pageSize=10&page=1&sort=firstname">
+              <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+                width="24" height="20" viewBox="0 0 840.000000 763.000000"
+                preserveAspectRatio="xMidYMid meet">
+
+                <g transform="translate(0.000000,763.000000) scale(0.100000,-0.100000)"
+                fill="#8e8ea9" stroke="none">
+                <path d="M3420 7224 c-19 -2 -78 -9 -130 -15 -485 -55 -974 -303 -1331 -676
+                -319 -334 -524 -754 -595 -1218 -35 -229 -20 -550 38 -800 67 -293 233 -633
+                423 -870 74 -93 232 -253 325 -328 79 -63 246 -177 261 -177 5 0 9 -4 9 -8 0
+                -4 -50 -27 -110 -51 -310 -120 -644 -317 -916 -541 -121 -100 -393 -374 -485
+                -490 -274 -345 -461 -686 -594 -1085 -38 -116 -99 -350 -110 -430 l-8 -47 72
+                -69 72 -69 3242 0 3243 0 36 48 c56 74 78 115 78 145 0 38 -51 238 -95 372
+                -328 991 -1060 1782 -1990 2148 -77 30 -146 57 -154 59 -8 2 19 25 60 50 258
+                161 474 374 650 640 429 649 478 1490 127 2181 -334 657 -953 1106 -1670 1212
+                -106 15 -380 27 -448 19z"/>
+                <path d="M6730 4821 c-70 -22 -121 -65 -156 -131 -17 -32 -19 -67 -22 -417
+                l-3 -383 -366 0 c-249 0 -378 -4 -404 -12 -51 -15 -114 -69 -142 -122 -20 -38
+                -22 -54 -22 -221 0 -165 2 -183 22 -220 27 -51 67 -89 118 -112 36 -16 79 -18
+                418 -21 l377 -3 0 -358 c0 -394 4 -425 60 -493 16 -20 51 -47 77 -60 44 -21
+                60 -23 213 -23 113 0 177 4 203 14 50 17 103 64 130 115 21 40 22 52 25 423
+                l3 382 382 3 c372 3 383 4 423 25 55 29 109 93 124 147 8 28 11 100 8 208 -3
+                163 -3 165 -33 214 -19 30 -49 60 -79 79 l-49 30 -389 3 -388 3 0 368 c0 411
+                -3 430 -67 494 -65 65 -89 72 -273 74 -91 1 -176 -2 -190 -6z"/>
+                </g>
+                </svg>
+              <span class="sc-kFCscd ikCpPW">Content Manager</span></a></span>
+            </div>
+       </li>`;
+
+        let li = document.querySelector('div[data-orientation="horizontal"] + div ul li:nth-child(3)').after(invite);
+       document.querySelector('div[data-orientation="horizontal"] + div ul li:nth-child(4)').innerHTML = contentInvite;
+       document.querySelector('div[data-orientation="horizontal"] + div ul li:nth-child(5)').style.display = "none";
+       document.querySelector('div[data-orientation="horizontal"] + div ul li:nth-child(6)').style.display = "none";
+
+      });
     
   },
 };
