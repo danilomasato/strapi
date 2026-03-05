@@ -306,8 +306,14 @@ export default {
         height: 300px;
       }
 
-      #main-content > div:nth-child(1) > div > div > div > div > button {
-        display: block;
+      #main-content > div:nth-child(1) > div > div > div > div > button span:nth-child(2) {
+        font-size: 0;
+      }
+
+      
+      #main-content > div:nth-child(1) > div > div > div > div > button span:nth-child(2)::before {
+        content: 'Convidar Corretor(a)';
+        font-size: 1.2rem;
       }
        
       #main-content > form > div:nth-child(1) > div > div > div > div > button span,
@@ -345,7 +351,7 @@ export default {
 
        const contentInvite =`
           <div><span data-state="closed">
-            <a aria-label="Adicionar Corretor" class="sc-bgylsh sc-eFtBSE lizKBy bltvKm" href="http://localhost:1337/admin/settings/users?pageSize=10&page=1&sort=firstname">
+            <a aria-label="Adicionar Corretor" class="sc-bgylsh sc-eFtBSE lizKBy bltvKm" href="https://sublime-bat-ad2fca1255.strapiapp.com/admin/settings/users?pageSize=10&page=1&sort=firstname">
               <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
                 width="24" height="20" viewBox="0 0 840.000000 763.000000"
                 preserveAspectRatio="xMidYMid meet">
@@ -379,7 +385,10 @@ export default {
        document.querySelector('div[data-orientation="horizontal"] + div ul li:nth-child(4)').innerHTML = contentInvite;
        document.querySelector('div[data-orientation="horizontal"] + div ul li:nth-child(5)').style.display = "none";
        document.querySelector('div[data-orientation="horizontal"] + div ul li:nth-child(6)').style.display = "none";
-
+       
+       if(window.location.pathname === "/admin/settings/users") {
+        document.querySelector('#main-content div[data-strapi-header] > div > div button').style.display = "block";
+       }
       });
     
   },
