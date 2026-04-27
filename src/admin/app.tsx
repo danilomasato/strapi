@@ -337,7 +337,11 @@ export default {
         } else {
             document.addEventListener("DOMContentLoaded", fn);
         }
-    }    
+    } 
+    
+    setTimeout(() => {
+       document.querySelector("#strapi > div > div > div > form > div > div > div:nth-child(6) > div > div > label").innerHTML = "Finalize seu cadastro ou leia nossos <a href='http://google.com'>Termos de Uso</a>"
+    }, 1000);
 
     docReady(function() {
        var title = document.querySelector('h1')
@@ -351,7 +355,7 @@ export default {
 
        const contentInvite =`
           <div><span data-state="closed">
-            <a aria-label="Adicionar Corretor" class="sc-bgylsh sc-eFtBSE lizKBy bltvKm" href="https://sublime-bat-ad2fca1255.strapiapp.com/admin/settings/users?pageSize=10&page=1&sort=firstname">
+            <a aria-label="Adicionar Corretor" class="sc-bgylsh sc-eFtBSE lizKBy bltvKm" href="/admin/settings/users?pageSize=10&page=1&sort=firstname">
               <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
                 width="24" height="20" viewBox="0 0 840.000000 763.000000"
                 preserveAspectRatio="xMidYMid meet">
