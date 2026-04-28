@@ -340,7 +340,7 @@ export default {
     } 
     
     setTimeout(() => {
-       document.querySelector("#strapi > div > div > div > form > div > div > div:nth-child(6) > div > div > label").innerHTML = "Finalize seu cadastro ou leia nossos <a href='http://google.com'>Termos de Uso</a>"
+       document.querySelector("#strapi > div > div > div > form > div > div > div:nth-child(6) > div > div > label").innerHTML = "Ao finalizar o cadastro você concorda com nossos <a href='https://drive.google.com/file/d/14KrwuRBWVf1IT5m7Iu4FqS7D-bgyIYdE/view?usp=sharing'>Termos de Uso</a>"
     }, 1000);
 
     docReady(function() {
