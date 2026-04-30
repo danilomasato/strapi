@@ -255,13 +255,12 @@ export default {
           color: #000 !important;
       }
 
-      div[role="dialog"] div > div > div:nth-child(2) > button:nth-child(1),
-      div[role="dialog"] div > div > div:nth-child(2) > button:nth-child(4) {
+      div[role="dialog"] div > div > div:nth-child(2) > button:nth-child(1){
           text-indent: -99999px;
       }
 
       nav[aria-label="Conteúdo"] ul li:nth-child(1) span,
-      nav[aria-label="Conteúdo"] ul li:nth-child(4) span {
+      nav ul li:nth-child(4) span {
         visibility: hidden;
         font-size: 0;
       }
