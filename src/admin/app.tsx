@@ -165,6 +165,7 @@ export default {
       }
 
       #strapi div[data-orientation="horizontal"] + div > ul > li:nth-child(1),
+      #strapi div[data-orientation="horizontal"] + div > ul > li:nth-child(5),
       main[aria-labelledby="main-content-title"] div:nth-child(2) > div button[aria-haspopup="dialog"]:nth-child(2),
       #strapi div[data-orientation="horizontal"] + div > ul > li:nth-child(2) svg path,
       #main-content div[data-strapi-header] > div > div button,
@@ -254,11 +255,13 @@ export default {
           color: #000 !important;
       }
 
-      div[role="dialog"] div > div > div:nth-child(2) > button:nth-child(1) {
+      div[role="dialog"] div > div > div:nth-child(2) > button:nth-child(1),
+      div[role="dialog"] div > div > div:nth-child(2) > button:nth-child(5) {
           text-indent: -99999px;
       }
 
-      nav[aria-label="Conteúdo"] ul li:nth-child(1) span {
+      nav[aria-label="Conteúdo"] ul li:nth-child(1) span,
+      nav[aria-label="Conteúdo"] ul li:nth-child(5) span {
         visibility: hidden;
         font-size: 0;
       }
