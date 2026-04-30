@@ -259,9 +259,12 @@ export default {
           text-indent: -99999px;
       }
 
-      nav[aria-label="Conteúdo"] ul li:nth-child(1) span,
-      nav ul li:nth-child(4) span {
+      nav[aria-label="Conteúdo"] ul li:nth-child(1) span {
         visibility: hidden;
+        font-size: 0;
+      }
+
+       nav ul li:nth-child(4) span {
         font-size: 0;
       }
 
