@@ -333,7 +333,7 @@ export default {
     // see if DOM is already available
         if (document.readyState === "complete" || document.readyState === "interactive") {
             // call on next available tick
-            setTimeout(fn, 6000);
+            setTimeout(fn, 8000);
         } else {
             document.addEventListener("DOMContentLoaded", fn);
         }
