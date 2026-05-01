@@ -357,6 +357,7 @@ export default {
       
       if(window.location.pathname === "/admin/settings/users") {
         document.querySelector('#main-content div[data-strapi-header] > div > div button').style.display = "block";
+        document.querySelector('#main-content div[data-strapi-header] > div > div button span:nth-child(2)').innerHTML = "Convidar Corretor";
        }
     }, 3000);
 
