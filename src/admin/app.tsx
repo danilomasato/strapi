@@ -345,12 +345,14 @@ export default {
     } 
     
     setTimeout(() => {
-       document.querySelector("#strapi > div > div > div > form > div > div > div:nth-child(6) > div > div > label").innerHTML = "Ao finalizar o cadastro você concorda com nossos <a href='https://drive.google.com/file/d/14KrwuRBWVf1IT5m7Iu4FqS7D-bgyIYdE/view?usp=sharing'>Termos de Uso</a>"
+      const terms = document.querySelector("#strapi > div > div > div > form > div > div > div:nth-child(6) > div > div > label");
+      if(terms)
+      terms.innerHTML = "Ao finalizar o cadastro você concorda com nossos <a href='https://drive.google.com/file/d/14KrwuRBWVf1IT5m7Iu4FqS7D-bgyIYdE/view?usp=sharing'>Termos de Uso</a>"
       
       if(window.location.pathname === "/admin/settings/users") {
         document.querySelector('#main-content div[data-strapi-header] > div > div button').style.display = "block";
        }
-    }, 1000);
+    }, 3000);
 
     docReady(function() {
        var title = document.querySelector('h1')
@@ -358,7 +360,6 @@ export default {
        if(title.innerHTML.includes('Create an entry')){
         title.innerHTML = 'Criar Novo Anúncio';
        }
-       
 
       let invite = document.createElement("li");
 
