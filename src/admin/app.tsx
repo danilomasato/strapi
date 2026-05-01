@@ -334,11 +334,12 @@ export default {
       }
     `;
     document.head.appendChild(style);
-    function docReady(fn) {
+
+   function docReady(fn) {
     // see if DOM is already available
         if (document.readyState === "complete" || document.readyState === "interactive") {
             // call on next available tick
-            setTimeout(fn, 12000);
+            setTimeout(fn, 3000);
         } else {
             document.addEventListener("DOMContentLoaded", fn);
         }
@@ -355,9 +356,9 @@ export default {
     }, 3000);
 
     docReady(function() {
-       var title = document.querySelector('h1')
+       const title = document.querySelector('h1')
 
-       if(title.innerHTML.includes('Create an entry')){
+       if(title && title.innerHTML.includes('Create an entry')){
         title.innerHTML = 'Criar Novo Anúncio';
        }
 
@@ -396,9 +397,13 @@ export default {
        </li>`;
 
         let li = document.querySelector('div[data-orientation="horizontal"] + div ul li:nth-child(3)').after(invite);
-       document.querySelector('div[data-orientation="horizontal"] + div ul li:nth-child(4)').innerHTML = contentInvite;
-       document.querySelector('div[data-orientation="horizontal"] + div ul li:nth-child(5)').style.display = "none";
-       document.querySelector('div[data-orientation="horizontal"] + div ul li:nth-child(6)').style.display = "none";
+       console.log(document.querySelector('div[data-orientation="horizontal"] + div ul li:nth-child(4)'))
+        if(document.querySelector('div[data-orientation="horizontal"] + div ul li:nth-child(4)'))
+        document.querySelector('div[data-orientation="horizontal"] + div ul li:nth-child(4)').innerHTML = contentInvite;
+       if(document.querySelector('div[data-orientation="horizontal"] + div ul li:nth-child(5)'))
+        document.querySelector('div[data-orientation="horizontal"] + div ul li:nth-child(5)').style.display = "none";
+       if(document.querySelector('div[data-orientation="horizontal"] + div ul li:nth-child(6)'))
+        document.querySelector('div[data-orientation="horizontal"] + div ul li:nth-child(6)').style.display = "none";
        
        
       });
