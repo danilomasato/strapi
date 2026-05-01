@@ -327,6 +327,11 @@ export default {
         margin-right: 5px;
       }
 
+      #main-content div[data-strapi-header] > div > div button span:nth-child(1) {
+        float: left;
+        margin-right: 5px;
+      }
+
       #main-content > div:nth-child(1) > div > div > div > div button,
       #main-content section[plugin::admin.profile-info"],
       section[aria-labelledby="plugin::content-manager.chart-entries"]{
@@ -339,7 +344,7 @@ export default {
     // see if DOM is already available
         if (document.readyState === "complete" || document.readyState === "interactive") {
             // call on next available tick
-            setTimeout(fn, 3000);
+            setTimeout(fn, 6000);
         } else {
             document.addEventListener("DOMContentLoaded", fn);
         }
