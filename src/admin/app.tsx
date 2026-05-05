@@ -6,6 +6,12 @@ export default {
     defaultLocale: 'pt-BR',
     locales: ['pt-BR'],
     translations: {
+       en: {
+                 "Auth.form.welcome.title": "Painel ADM TSA Imóveis",
+          'Auth.form.welcome.subtitle': 'Acesso para Corretores',
+        "content-manager.containers.Edit.submit": "ENtrar"
+        // Add more key/value pairs here
+      },
       "pt-BR": {
          // Botão na Galeria Principal
         'upload.control-utils.add-folder': 'Criar Pasta',
