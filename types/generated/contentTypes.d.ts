@@ -845,6 +845,37 @@ export interface ApiArticleArticle extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiBrokerBroker extends Struct.CollectionTypeSchema {
+  collectionName: 'brokers';
+  info: {
+    displayName: 'corretores';
+    pluralName: 'brokers';
+    singularName: 'broker';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    creci: Schema.Attribute.BigInteger;
+    email: Schema.Attribute.Email;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::broker.broker'
+    > &
+      Schema.Attribute.Private;
+    nome: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    sobrenome: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiGlobalGlobal extends Struct.SingleTypeSchema {
   collectionName: 'globals';
   info: {
@@ -1453,6 +1484,7 @@ declare module '@strapi/strapi' {
       'api::about.about': ApiAboutAbout;
       'api::anuncio.anuncio': ApiAnuncioAnuncio;
       'api::article.article': ApiArticleArticle;
+      'api::broker.broker': ApiBrokerBroker;
       'api::global.global': ApiGlobalGlobal;
       'api::tipo.tipo': ApiTipoTipo;
       'plugin::content-releases.release': PluginContentReleasesRelease;

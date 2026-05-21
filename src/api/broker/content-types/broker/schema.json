@@ -1,0 +1,27 @@
+{
+  "kind": "collectionType",
+  "collectionName": "brokers",
+  "info": {
+    "singularName": "broker",
+    "pluralName": "brokers",
+    "displayName": "corretores"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "nome": {
+      "type": "string"
+    },
+    "sobrenome": {
+      "type": "string"
+    },
+    "creci": {
+      "type": "biginteger"
+    },
+    "email": {
+      "type": "email"
+    }
+  }
+}
