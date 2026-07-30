@@ -1,12 +1,14 @@
+import { randomBytes } from "crypto";
+
 const CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
 function gerarCodigo(tamanho = 8) {
+  const bytes = randomBytes(tamanho);
+
   let codigo = "";
 
   for (let i = 0; i < tamanho; i++) {
-    codigo += CHARS.charAt(
-      Math.floor(Math.random() * CHARS.length)
-    );
+    codigo += CHARS[bytes[i] % CHARS.length];
   }
 
   return codigo;
@@ -22,8 +24,8 @@ async function gerarCodigoUnico(strapi: any): Promise<string> {
           $eq: codigo,
         },
       },
-      limit: 1,
       fields: ["codigo"],
+      limit: 1,
     });
 
     if (existente.length === 0) {
@@ -33,14 +35,34 @@ async function gerarCodigoUnico(strapi: any): Promise<string> {
 }
 
 export default {
+  /**
+   * Novo anúncio
+   */
   async beforeCreate(event) {
     const { data } = event.params;
 
-    // Se já veio preenchido, mantém
-    if (data.codigo) {
+    if (!data.codigo) {
+      data.codigo = await gerarCodigoUnico(strapi);
+    }
+  },
+
+  /**
+   * Atualização / Publicação
+   */
+  async beforeUpdate(event) {
+    const { where, data } = event.params;
+
+    const anuncio = await strapi.documents("api::anuncio.anuncio").findOne({
+      documentId: where.documentId,
+      fields: ["codigo"],
+    });
+
+    // Se já possui código, nunca altera
+    if (anuncio?.codigo) {
       return;
     }
 
+    // Se ainda não possui, gera um
     data.codigo = await gerarCodigoUnico(strapi);
   },
 };
