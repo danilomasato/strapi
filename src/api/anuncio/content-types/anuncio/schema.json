@@ -226,6 +226,15 @@
         "numberType": "Integer",
         "description": "Use as setas para Cima/Baixo para escolher a quantidade de Suítes"
       }
+    },
+    "codigo": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "unique": true
     }
   }
 }

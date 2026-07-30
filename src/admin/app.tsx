@@ -152,6 +152,11 @@ export default {
         font-size: 62.5%;
       }
 
+      #main-content input[name="codigo"] {
+        background-color: #e0e0e0;
+        cursor: not-allowed;
+      }
+
       #main-content section[data-strapi-widget-id="plugin::content-manager.last-edited-entries"] svg + h2 {
         visibility: hidden;
       }

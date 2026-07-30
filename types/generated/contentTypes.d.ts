@@ -543,6 +543,13 @@ export interface ApiAnuncioAnuncio extends Struct.CollectionTypeSchema {
           localized: true;
         };
       }>;
+    codigo: Schema.Attribute.String &
+      Schema.Attribute.Unique &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
     Condominio: Schema.Attribute.String &
       Schema.Attribute.CustomField<
         'plugin::superfields.tooltip-field',
