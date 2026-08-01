@@ -2,6 +2,8 @@ import { randomBytes } from "crypto";
 
 const CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
+let atualizandoCampos = false;
+
 function gerarCodigo(tamanho = 8) {
   const bytes = randomBytes(tamanho);
 
@@ -53,31 +55,65 @@ export default {
   /**
    * Atualização / Publicação
    */
-  async beforeUpdate(event) {
-    const { where, data } = event.params;
+  async afterUpdate(event) {
 
-    const anuncio = await strapi
-      .documents("api::anuncio.anuncio")
-      .findOne({
-        documentId: where.documentId,
-        fields: ["id", "codigo", "titulo"],
-      });
-
-
-    if (!anuncio) {
+    if (atualizandoCampos) {
       return;
     }
 
+    atualizandoCampos = true;
 
-    // Mantém geração do código para anúncios antigos sem código
-    if (!anuncio.codigo) {
-      data.codigo = await gerarCodigoUnico(strapi);
-    }
+    try {
+      const { result } = event;
 
 
-    // Preenche automaticamente ID + título
-    if (anuncio.titulo) {
-      data.nome_exibicao = `${anuncio.id} - ${anuncio.titulo}`;
+      const anuncio = await strapi
+        .documents("api::anuncio.anuncio")
+        .findOne({
+          documentId: result.documentId,
+          fields: [
+            "id",
+            "codigo",
+            "titulo",
+            "nome_exibicao"
+          ],
+        });
+
+
+      if (!anuncio) {
+        return;
+      }
+
+
+      const dataAtualizar: any = {};
+
+
+      // Gera código se estiver vazio
+      if (!anuncio.codigo) {
+        dataAtualizar.codigo = await gerarCodigoUnico(strapi);
+      }
+
+
+      // Atualiza nome de exibição
+      const nome = `${anuncio.id} - ${anuncio.titulo}`;
+
+      if (anuncio.nome_exibicao !== nome) {
+        dataAtualizar.nome_exibicao = nome;
+      }
+
+
+      // Só atualiza se tiver algo para alterar
+      if (Object.keys(dataAtualizar).length > 0) {
+        await strapi
+          .documents("api::anuncio.anuncio")
+          .update({
+            documentId: result.documentId,
+            data: dataAtualizar,
+          });
+      }
+
+    } finally {
+      atualizandoCampos = false;
     }
   },
 
