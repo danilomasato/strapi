@@ -599,6 +599,12 @@ export interface ApiAnuncioAnuncio extends Struct.CollectionTypeSchema {
       'oneToMany',
       'api::anuncio.anuncio'
     >;
+    nome_exibicao: Schema.Attribute.String &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
     publishedAt: Schema.Attribute.DateTime;
     Quartos: Schema.Attribute.Integer &
       Schema.Attribute.CustomField<

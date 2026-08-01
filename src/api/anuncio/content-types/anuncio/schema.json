@@ -243,6 +243,14 @@
           "localized": true
         }
       }
+    },
+    "nome_exibicao": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
     }
   }
 }
