@@ -2,8 +2,6 @@ import { randomBytes } from "crypto";
 
 const CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
-let atualizandoNomeExibicao = false;
-
 function gerarCodigo(tamanho = 8) {
   const bytes = randomBytes(tamanho);
 
@@ -38,40 +36,6 @@ async function gerarCodigoUnico(strapi: any): Promise<string> {
   }
 }
 
-async function atualizarNomeExibicao(
-  strapi: any,
-  documentId: string
-) {
-  const anuncio = await strapi
-    .documents("api::anuncio.anuncio")
-    .findOne({
-      documentId,
-      fields: ["id", "titulo", "nome_exibicao"],
-    });
-
-  if (!anuncio) return;
-
-
-  const novoNome = `${anuncio.id} - ${anuncio.titulo}`;
-
-
-  // Evita salvar novamente se já estiver correto
-  if (anuncio.nome_exibicao === novoNome) {
-    return;
-  }
-
-
-  await strapi
-    .documents("api::anuncio.anuncio")
-    .update({
-      documentId,
-      data: {
-        nome_exibicao: novoNome,
-      },
-    });
-}
-
-
 export default {
 
   /**
@@ -92,45 +56,28 @@ export default {
   async beforeUpdate(event) {
     const { where, data } = event.params;
 
-
     const anuncio = await strapi
       .documents("api::anuncio.anuncio")
       .findOne({
         documentId: where.documentId,
-        fields: ["codigo"],
+        fields: ["id", "codigo", "titulo"],
       });
 
 
-    if (anuncio && !anuncio.codigo) {
-      data.codigo = await gerarCodigoUnico(strapi);
-    }
-  },
-
-
-  /**
-   * Preenche ID + Título depois de salvar/publicar
-   */
-  async afterUpdate(event) {
-
-    if (atualizandoNomeExibicao) {
+    if (!anuncio) {
       return;
     }
 
 
-    atualizandoNomeExibicao = true;
+    // Mantém geração do código para anúncios antigos sem código
+    if (!anuncio.codigo) {
+      data.codigo = await gerarCodigoUnico(strapi);
+    }
 
 
-    try {
-      const { result } = event;
-
-
-      await atualizarNomeExibicao(
-        strapi,
-        result.documentId
-      );
-
-    } finally {
-      atualizandoNomeExibicao = false;
+    // Preenche automaticamente ID + título
+    if (anuncio.titulo) {
+      data.nome_exibicao = `${anuncio.id} - ${anuncio.titulo}`;
     }
   },
 
