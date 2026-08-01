@@ -1,44 +1,140 @@
 
-#main-content > form h1 {
-    color: #000 !important;
+aside[aria-labelledby="additional-information"]:nth-child(2),   
+aside[aria-labelledby="additional-information"]:nth-child(1) h2,
+div[data-radix-scroll-area-viewport] ul > li:nth-child(2),
+#strapi > div > div > nav > div:nth-child(3) ul li:nth-child(1),
+#strapi > div > div > nav > div:nth-child(3) ul li:nth-child(4),
+#strapi > div > div > nav > div:nth-child(3) ul li:nth-child(5),
+#strapi > div > div > nav > div:nth-child(3) ul li:nth-child(6),
+#strapi > div > div > nav > div:nth-child(3) ul li:nth-child(7),
+#strapi div[data-orientation="horizontal"] + div > ul > li:nth-child(2) svg path,
+#main-content[aria-labelledby="main-content-title"] > div:nth-child(2) > div > section {
+    display: none;
+}
+#strapi div[data-orientation="horizontal"] + div > ul > li:nth-child(2) svg {
+    width: 20px;
+    height: 20px;
+    background-size: contain;  
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="20" height="20" fill="%238e8ea9" aria-hidden="true" focusable="false"><path d="M28 14.444V26a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V14.444a2 2 0 0 1 .646-1.473l10-9.435.014-.013a2 2 0 0 1 2.705.013l10 9.435A2 2 0 0 1 28 14.444"></path></svg>');
 }
 
-#main-content aside:nth-child(2) {
-    display: none !important;
+/**********
+Widgets home
+****************/
+#main-content section[data-strapi-widget-id="plugin::content-manager.last-edited-entries"] svg + h2 {
+visibility: hidden;
 }
 
-#main-content div[role="tablist"] > button > span:nth-child(1) {
-    visibility: hidden;
-    text-indent: -190px;
+#main-content section[data-strapi-widget-id="plugin::content-manager.last-edited-entries"] svg + h2::before {
+content: "Atividades Recentes";
+visibility: visible;
 }
 
-#main-content div[role="tablist"] > button > span:nth-child(1)::after {
-    content: 'Rascunho';
-    visibility: visible;
+#main-content section[data-strapi-widget-id="plugin::content-manager.last-published-entries"] svg + h2 {
+visibility: hidden;
 }
 
-#main-content div[role="tablist"] > button:nth-child(2) > span {
-    visibility: hidden;
-    text-indent: -190px;
+#main-content section[data-strapi-widget-id="plugin::content-manager.last-published-entries"] svg + h2::before {
+content: "Últimas publicações";
+visibility: visible;
 }
 
-#main-content div[role="tablist"] > button:nth-child(2) > span::after {
-    content: 'Publicado';
-    visibility: visible;
+section[aria-labelledby="plugin::admin.profile-info"] header > div + a {
+visibility: hidden;
 }
 
-#main-content span input {
-    color: #000 !important;
+section[aria-labelledby="plugin::admin.profile-info"] header > div + a::after {
+content: "Configurações de perfil";
+visibility: visible;
 }
 
-/* div[role="dialog"] div > div > div:nth-child(2) > button:nth-child(1) {
-    text-indent: -99999px;
+section[aria-labelledby="plugin::admin.profile-info"] header > div h2 {
+visibility: hidden;
 }
 
-div[role="dialog"] div > div > div:nth-child(2) > button:nth-child(1)::after {
-    content: "ADICIONAR PASTA" !important; /* TEXTO QUE VOCÊ QUER */
-    font-size: 12px !important;
-    font-weight: 600 !important;
-    text-transform: none !important;
-    text-indent: 0;
-} */
+section[aria-labelledby="plugin::admin.profile-info"] header > div h2::before {
+content: "Perfil";
+visibility: visible;
+}
+
+/**********
+Menu Configurações
+****************/
+div[data-orientation="horizontal"] + div ul li:nth-child(8),
+nav[aria-label="Configurações"] {
+    display: none;
+}
+
+button[id*="trigger-draft"] {
+    width: 90px;
+}
+
+button[id*="trigger-draft"] span:first-child,
+button[id*="trigger-published"] span:first-child {
+  color: transparent;
+  position: relative;
+}
+
+button[id*="trigger-draft"] span:first-child::before {
+  content: "Rascunho";
+  color: #32324d;
+}
+
+button[id*="trigger-published"] span:first-child::before {
+  content: "Publicado";
+  color: #32324d;
+  position: absolute;
+  left: 0;
+}
+
+/* Container visual */
+#main-content .sc-jgzHYo {
+  background: transparent !important;
+  border: 1px solid #e4e6eb !important;
+  border-radius: 10px !important;
+  min-height: 42px !important;
+  box-shadow: none !important;
+}
+
+/* Todos os inputs */
+#main-content .sc-jgzHYo input {
+  height: 42px !important;
+  min-height: 42px !important;
+  color: #777777 !important;
+  background: transparent !important;
+  font-family: Inter, system-ui, sans-serif !important;
+}
+
+/* Selects */
+#main-content [role="combobox"] {
+  min-height: 42px !important;
+  height: 42px !important;
+}
+
+/* Campo de data */
+#main-content [placeholder*="/"],
+#main-content input[type="date"] {
+  height: 42px !important;
+}
+
+/* Texto */
+#main-content label {
+  color: #6b7280 !important;
+  font-weight: 500 !important;
+}
+
+/* Placeholders */
+#main-content input::placeholder {
+  color: #9ca3af !important;
+}
+
+/* Hover */
+#main-content .sc-jgzHYo:hover {
+  border-color: #d1d5db !important;
+}
+
+/* Focus */
+#main-content .sc-jgzHYo:focus-within {
+  border-color: #9ca3af !important;
+  box-shadow: 0 0 0 2px rgba(156,163,175,.12) !important;
+}
