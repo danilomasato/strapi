@@ -442,6 +442,13 @@
     "@codemirror/view" "^6.37.0"
     crelt "^1.0.5"
 
+"@codemirror/state@6.7.1":
+  version "6.7.1"
+  resolved "https://registry.yarnpkg.com/@codemirror/state/-/state-6.7.1.tgz#9e88a17448c1dbc7b50acbeeec979ed7ccf1d6fc"
+  integrity sha512-9QzNDgE4EYDnAHfrTlR2lwiPciiOymLtwKK+8yHQzCc7GXhAP9xdEbEJFy2IWB1j9UGUl9BsgMmTo/ImA02T7A==
+  dependencies:
+    "@marijn/find-cluster-break" "^1.0.0"
+
 "@codemirror/state@^6.0.0", "@codemirror/state@^6.1.1", "@codemirror/state@^6.6.0":
   version "6.6.0"
   resolved "https://registry.yarnpkg.com/@codemirror/state/-/state-6.6.0.tgz#b88dbdc14aea4ace3c6d67bb77fe28bb84e4394e"
@@ -459,7 +466,7 @@
     "@codemirror/view" "^6.0.0"
     "@lezer/highlight" "^1.0.0"
 
-"@codemirror/view@^6.0.0", "@codemirror/view@^6.17.0", "@codemirror/view@^6.23.0", "@codemirror/view@^6.27.0", "@codemirror/view@^6.37.0", "@codemirror/view@^6.42.0":
+"@codemirror/view@6.43.0", "@codemirror/view@^6.0.0", "@codemirror/view@^6.17.0", "@codemirror/view@^6.23.0", "@codemirror/view@^6.27.0", "@codemirror/view@^6.37.0", "@codemirror/view@^6.42.0":
   version "6.43.0"
   resolved "https://registry.yarnpkg.com/@codemirror/view/-/view-6.43.0.tgz#a577da65f1d5d8f7cbf08e14849284c12f38365a"
   integrity sha512-V7ZCLQO3Jus9hzh2jVCCPW3mO4IBMr43O37PqSUYautJSnnJF41YlgLw21x0fLJTYvJ+Vkm6Gp+qKGH9pltgXA==
@@ -493,12 +500,30 @@
   resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.5.7.tgz#1d572bfbbe14b7704e0ba0f39b74815b84870d70"
   integrity sha512-dBVuXR082gk3jsFp7Rd/JI4kytwGHecnCoTtXFb7DB6CNHp4rg5k1bhg0nWdLGLnOV71lmDzGQaLMy8iPLY0pw==
 
+"@dnd-kit/abstract@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@dnd-kit/abstract/-/abstract-0.4.0.tgz#5dd39a1f6a92604537e1384436813e18fa4d7831"
+  integrity sha512-loEEJxKT5oLOLeRBJVTO9qpgvvW/Qq902xO20v1JMbpANuN/NLurUdpxIwNpVz+RtOSyzznnbc7lO7psmOhc9A==
+  dependencies:
+    "@dnd-kit/geometry" "^0.4.0"
+    "@dnd-kit/state" "^0.4.0"
+    tslib "^2.6.2"
+
 "@dnd-kit/accessibility@^3.1.1":
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/@dnd-kit/accessibility/-/accessibility-3.1.1.tgz#3b4202bd6bb370a0730f6734867785919beac6af"
   integrity sha512-2P+YgaXF+gRsIihwwY1gCsQSYnu9Zyj2py8kY5fFvUM1qm2WA2u639R6YNVfU4GWr+ZM5mqEsfHZZLoRONbemw==
   dependencies:
     tslib "^2.0.0"
+
+"@dnd-kit/collision@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@dnd-kit/collision/-/collision-0.4.0.tgz#b76f53301d41bd39d5fa7924ae0d994c9e1d3d1a"
+  integrity sha512-oOHHUkH1h9Vl2m8TwLw/mPHA7Blf+s0PYcRoLNWNBVxDzugJKZo8WdpU58EMu9qkqyQGrR/YTOozGiMPhlqZ5Q==
+  dependencies:
+    "@dnd-kit/abstract" "^0.4.0"
+    "@dnd-kit/geometry" "^0.4.0"
+    tslib "^2.6.2"
 
 "@dnd-kit/core@6.3.1":
   version "6.3.1"
@@ -509,6 +534,25 @@
     "@dnd-kit/utilities" "^3.2.2"
     tslib "^2.0.0"
 
+"@dnd-kit/dom@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@dnd-kit/dom/-/dom-0.4.0.tgz#3cf0d7983f51c6c82edc950aa418675f048fc3bb"
+  integrity sha512-mJDKt0BtlHXetZyrvZXh6++aycleIbYWH/OVC4nlszDh8NvW7q8dfsxFllR5RtLKLcykLaI4o545Figfks/HZQ==
+  dependencies:
+    "@dnd-kit/abstract" "^0.4.0"
+    "@dnd-kit/collision" "^0.4.0"
+    "@dnd-kit/geometry" "^0.4.0"
+    "@dnd-kit/state" "^0.4.0"
+    tslib "^2.6.2"
+
+"@dnd-kit/geometry@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@dnd-kit/geometry/-/geometry-0.4.0.tgz#b24d4e08bdee8b1cba0f798732e399b4c47776a0"
+  integrity sha512-d1n+CU54V/qF/g792bmJK2oR4f5jOL7Pls2IfC+j9f5UBECpjsYbcPZ/krom/z8LgieqvMh1qrUkdcBjJJ7vpg==
+  dependencies:
+    "@dnd-kit/state" "^0.4.0"
+    tslib "^2.6.2"
+
 "@dnd-kit/modifiers@9.0.0":
   version "9.0.0"
   resolved "https://registry.yarnpkg.com/@dnd-kit/modifiers/-/modifiers-9.0.0.tgz#96a0280c77b10c716ef79d9792ce7ad04370771d"
@@ -517,6 +561,16 @@
     "@dnd-kit/utilities" "^3.2.2"
     tslib "^2.0.0"
 
+"@dnd-kit/react@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@dnd-kit/react/-/react-0.4.0.tgz#2b90de9edee228c7fbe71bbddfedf36dff17bef6"
+  integrity sha512-J2/N4CpQf98zJBZhMljDNsc+QR4VtUKU9BRO1+Di4OGaB1qafMC4qZ11xKXOkjw+d7h82FRSXmXCo0c8+VWaWg==
+  dependencies:
+    "@dnd-kit/abstract" "^0.4.0"
+    "@dnd-kit/dom" "^0.4.0"
+    "@dnd-kit/state" "^0.4.0"
+    tslib "^2.6.2"
+
 "@dnd-kit/sortable@10.0.0":
   version "10.0.0"
   resolved "https://registry.yarnpkg.com/@dnd-kit/sortable/-/sortable-10.0.0.tgz#1f9382b90d835cd5c65d92824fa9dafb78c4c3e8"
@@ -524,6 +578,14 @@
   dependencies:
     "@dnd-kit/utilities" "^3.2.2"
     tslib "^2.0.0"
+
+"@dnd-kit/state@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@dnd-kit/state/-/state-0.4.0.tgz#9c8b2c587eda75b98514beec450ed47ffd0441bd"
+  integrity sha512-vVdwOY9VsYdMNa7Z0xQhTXlzHqCcCugGuoM1kzvZhnZ0tYVPRdmIhWfeO6Y2ZoN92JwYAyJRRNl4ICkEe2mneg==
+  dependencies:
+    "@preact/signals-core" "^1.10.0"
+    tslib "^2.6.2"
 
 "@dnd-kit/utilities@3.2.2", "@dnd-kit/utilities@^3.2.2":
   version "3.2.2"
@@ -1425,6 +1487,11 @@
   version "1.0.0-next.29"
   resolved "https://registry.yarnpkg.com/@polka/url/-/url-1.0.0-next.29.tgz#5a40109a1ab5f84d6fd8fc928b19f367cbe7e7b1"
   integrity sha512-wwQAWhWSuHaag8c4q/KN/vCoeOJYshAIvMQwD4GpSb3OiZklFfvAgmj0VCBBImRpuF/aFgIRzllXlVX93Jevww==
+
+"@preact/signals-core@^1.10.0":
+  version "1.14.4"
+  resolved "https://registry.yarnpkg.com/@preact/signals-core/-/signals-core-1.14.4.tgz#d3588cbda237fcb3c8a8e478f6cc370653609eb7"
+  integrity sha512-HNB6HYeYKhQbJ1aKl+YRjrS4+QWHLKX6qKoUsfS/m0vqzsVaEBiZiaKbG/e+NKk2ch5ALQr/ihWaMHxiCuuWHA==
 
 "@radix-ui/number@1.0.1":
   version "1.0.1"
@@ -2670,6 +2737,40 @@
     lodash "4.17.23"
     react-remove-scroll "2.5.10"
 
+"@strapi/design-system@^2.1.0":
+  version "2.2.3"
+  resolved "https://registry.yarnpkg.com/@strapi/design-system/-/design-system-2.2.3.tgz#18c3722f706f9a1228cf42d9f1cc93eb00d55333"
+  integrity sha512-6eM0ebGETaFoWUks0dPEV9kLk2lx6/nUXwCM0dCITAKPr55r1KKc/DtFnST1tQdDC4KHvp3yL6H7y9P/Rb89RA==
+  dependencies:
+    "@codemirror/lang-json" "6.0.1"
+    "@codemirror/state" "6.7.1"
+    "@codemirror/view" "6.43.0"
+    "@floating-ui/react-dom" "2.1.0"
+    "@internationalized/date" "3.5.4"
+    "@internationalized/number" "3.5.3"
+    "@radix-ui/react-accordion" "1.1.2"
+    "@radix-ui/react-alert-dialog" "1.0.5"
+    "@radix-ui/react-avatar" "1.0.4"
+    "@radix-ui/react-checkbox" "1.0.4"
+    "@radix-ui/react-dialog" "1.0.5"
+    "@radix-ui/react-dismissable-layer" "1.0.5"
+    "@radix-ui/react-dropdown-menu" "2.0.6"
+    "@radix-ui/react-focus-guards" "1.0.1"
+    "@radix-ui/react-focus-scope" "1.0.4"
+    "@radix-ui/react-popover" "1.0.7"
+    "@radix-ui/react-progress" "1.0.3"
+    "@radix-ui/react-radio-group" "1.1.3"
+    "@radix-ui/react-scroll-area" "1.0.5"
+    "@radix-ui/react-switch" "1.0.3"
+    "@radix-ui/react-tabs" "1.0.4"
+    "@radix-ui/react-tooltip" "1.0.7"
+    "@radix-ui/react-use-callback-ref" "1.0.1"
+    "@strapi/ui-primitives" "2.2.3"
+    "@tanstack/react-virtual" "^3.10.8"
+    "@uiw/react-codemirror" "4.22.2"
+    lodash "4.18.1"
+    react-remove-scroll "2.5.10"
+
 "@strapi/email@5.46.1":
   version "5.46.1"
   resolved "https://registry.yarnpkg.com/@strapi/email/-/email-5.46.1.tgz#f92bc3fbee7b8f5c829edc95a2aeed211ffedb75"
@@ -2727,6 +2828,11 @@
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/@strapi/icons/-/icons-2.2.0.tgz#fe574fb26c991665a9bfc900c49afdf23a479add"
   integrity sha512-wVItrWIDYtvGpv1S5Lg580b5PXH2iw6dgcFnri5vVz4qZDP6ZOTpLmkwZybkfZcpIzq1KkjKyA1JZ6NLBE59cQ==
+
+"@strapi/icons@^2.1.0":
+  version "2.2.3"
+  resolved "https://registry.yarnpkg.com/@strapi/icons/-/icons-2.2.3.tgz#899ff1c9ae1eef9569b293fc710523e7a75b04e7"
+  integrity sha512-08BpuH9oEf6TssUMRsDfjZBCgA2+QPmp0ye2qallvKy2EBZb0uydaYvHzbgKfkajfOkUUFImBcTkblXSRvHVIA==
 
 "@strapi/logger@5.46.1":
   version "5.46.1"
@@ -2973,6 +3079,32 @@
     "@radix-ui/react-focus-guards" "1.0.1"
     "@radix-ui/react-focus-scope" "1.0.4"
     "@radix-ui/react-id" "1.0.1"
+    "@radix-ui/react-popper" "1.1.3"
+    "@radix-ui/react-portal" "1.0.4"
+    "@radix-ui/react-primitive" "1.0.3"
+    "@radix-ui/react-slot" "1.0.2"
+    "@radix-ui/react-use-controllable-state" "1.0.1"
+    "@radix-ui/react-use-layout-effect" "1.0.1"
+    "@radix-ui/react-use-previous" "1.0.1"
+    "@radix-ui/react-visually-hidden" "1.0.3"
+    "@tanstack/react-virtual" "^3.10.8"
+    aria-hidden "1.2.4"
+    react-remove-scroll "2.5.10"
+
+"@strapi/ui-primitives@2.2.3":
+  version "2.2.3"
+  resolved "https://registry.yarnpkg.com/@strapi/ui-primitives/-/ui-primitives-2.2.3.tgz#bd238b21af3a8b8ac193b1f3b4f78c93713994fa"
+  integrity sha512-5/G77aaXl+zWqH8wTUzjeskibf1Hqk7Fv6YSo6PXuGUH5Um+4H88NxKiXqaCAtkXdjQo7NiWu0yESAvwofkclg==
+  dependencies:
+    "@radix-ui/number" "1.0.1"
+    "@radix-ui/primitive" "1.0.1"
+    "@radix-ui/react-collection" "1.0.3"
+    "@radix-ui/react-compose-refs" "1.0.1"
+    "@radix-ui/react-context" "1.0.1"
+    "@radix-ui/react-direction" "1.0.1"
+    "@radix-ui/react-dismissable-layer" "1.0.5"
+    "@radix-ui/react-focus-guards" "1.0.1"
+    "@radix-ui/react-focus-scope" "1.0.4"
     "@radix-ui/react-popper" "1.1.3"
     "@radix-ui/react-portal" "1.0.4"
     "@radix-ui/react-primitive" "1.0.3"
@@ -8864,7 +8996,7 @@ react-intl@6.6.2:
     intl-messageformat "10.5.11"
     tslib "^2.4.0"
 
-react-intl@^7.1.10:
+react-intl@^7.1.10, react-intl@^7.1.14:
   version "7.1.14"
   resolved "https://registry.yarnpkg.com/react-intl/-/react-intl-7.1.14.tgz#5500f76b0bb35694a7bec418b1adf1533dad6752"
   integrity sha512-VE/0Wi/lHJlBC7APQpCzLUdIt3GB5B0GZrRW8Q+ACbkHI4j+Wwgg9J1TniN6zmLHmPH5gxXcMy+fkSPfw5p1WQ==
@@ -9793,6 +9925,16 @@ statuses@~2.0.2:
   resolved "https://registry.yarnpkg.com/statuses/-/statuses-2.0.2.tgz#8f75eecef765b5e1cfcdc080da59409ed424e382"
   integrity sha512-DvEy55V3DB7uknRo+4iOGT5fP1slR8wQohVdknigZPMpMstaKJQWhwiYBACJE3Ul2pTnATihhBYnRhZQHGBiRw==
 
+strapi-plugin-sortable-entries@^1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/strapi-plugin-sortable-entries/-/strapi-plugin-sortable-entries-1.3.0.tgz#71da7d4cffb4c66874c6191b413a10139aca978e"
+  integrity sha512-xzetPSRZx7X5pfVWyjp5GBIeHBQ+EwST6H4mfhMZV+c70C7U3gsYsPtIaGLDy2ztZzjNf7Is8CfzTJtHPOg+0g==
+  dependencies:
+    "@dnd-kit/react" "^0.4.0"
+    "@strapi/design-system" "^2.1.0"
+    "@strapi/icons" "^2.1.0"
+    react-intl "^7.1.14"
+
 strapi-plugin-superfields@^5.8.2:
   version "5.8.2"
   resolved "https://registry.yarnpkg.com/strapi-plugin-superfields/-/strapi-plugin-superfields-5.8.2.tgz#2e30e549dcdec3e6bd3d0de29b382cc023a89bae"
@@ -10154,7 +10296,7 @@ trough@^2.0.0:
   resolved "https://registry.yarnpkg.com/trough/-/trough-2.2.0.tgz#94a60bd6bd375c152c1df911a4b11d5b0256f50f"
   integrity sha512-tmMpK00BjZiUyVyvrBK7knerNgmgvcV/KLVyuma/SC+TQN167GrMRciANTz09+k3zW8L8t60jWO1GpfkZdjTaw==
 
-tslib@^2.0.0, tslib@^2.0.1, tslib@^2.0.3, tslib@^2.1.0, tslib@^2.4.0, tslib@^2.7.0, tslib@^2.8.0:
+tslib@^2.0.0, tslib@^2.0.1, tslib@^2.0.3, tslib@^2.1.0, tslib@^2.4.0, tslib@^2.6.2, tslib@^2.7.0, tslib@^2.8.0:
   version "2.8.1"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.8.1.tgz#612efe4ed235d567e8aba5f2a5fab70280ade83f"
   integrity sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==

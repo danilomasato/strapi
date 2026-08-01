@@ -614,6 +614,12 @@ export interface ApiAnuncioAnuncio extends Struct.CollectionTypeSchema {
         };
       }> &
       Schema.Attribute.DefaultTo<0>;
+    sortOrder: Schema.Attribute.Integer &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
     Suites: Schema.Attribute.Integer &
       Schema.Attribute.CustomField<
         'plugin::superfields.tooltip-number-field',
