@@ -8,9 +8,12 @@ div[data-radix-scroll-area-viewport] ul > li:nth-child(2),
 #strapi > div > div > nav > div:nth-child(3) ul li:nth-child(6),
 #strapi > div > div > nav > div:nth-child(3) ul li:nth-child(7),
 #strapi div[data-orientation="horizontal"] + div > ul > li:nth-child(2) svg path,
-#main-content[aria-labelledby="main-content-title"] > div:nth-child(2) > div > section {
-    display: none;
+#main-content[aria-labelledby="main-content-title"] > div:nth-child(2) > div > section,
+div:has(> input[name="search_contentType"]),
+div:has(> div[aria-label="Locales"]){
+    display: none !important;
 }
+
 #strapi div[data-orientation="horizontal"] + div > ul > li:nth-child(2) svg {
     width: 20px;
     height: 20px;
