@@ -157,6 +157,12 @@ export default {
         cursor: not-allowed;
       }
 
+      div:has(> div > div > input[name="codigo"]),
+      div:has(> div > div > input[name="sortOrder"]),
+      div:has(> div > div > input[name="nome_exibicao"]) {
+        display: none !important;
+      }
+
       #main-content section[data-strapi-widget-id="plugin::content-manager.last-edited-entries"] svg + h2 {
         visibility: hidden;
       }

@@ -518,13 +518,79 @@ export interface ApiAnuncioAnuncio extends Struct.CollectionTypeSchema {
           localized: true;
         };
       }>;
-    Bairro: Schema.Attribute.String &
-      Schema.Attribute.CustomField<
-        'plugin::superfields.tooltip-field',
-        {
-          description: 'Digite a regi\u00E3o do im\u00F3vel';
-        }
-      > &
+    Bairro: Schema.Attribute.Enumeration<
+      [
+        'Alto da Boa Vista',
+        'American\u00F3polis',
+        'Barragem',
+        'Brooklin',
+        'Brooklin Novo',
+        'Brooklin Velho',
+        'Campo Belo',
+        'Campo Grande',
+        'Campo Limpo',
+        'Capela do Socorro',
+        'Cap\u00E3o Redondo',
+        'Ch\u00E1cara Klabin',
+        'Ch\u00E1cara Santo Ant\u00F4nio',
+        'Cidade Ademar',
+        'Cidade Dutra',
+        'Cidade Vargas',
+        'Col\u00F4nia Paulista',
+        'Concei\u00E7\u00E3o',
+        'Cupec\u00EA',
+        'Cursino',
+        'Graja\u00FA',
+        'Granja Julieta',
+        'Heli\u00F3polis',
+        'Ibirapuera',
+        'Indian\u00F3polis',
+        'Interlagos',
+        'Ipiranga',
+        'Jabaquara',
+        'Jardim Casablanca',
+        'Jardim Guanhembu',
+        'Jardim Ipanema',
+        'Jardim Marajoara',
+        'Jardim Miriam',
+        'Jardim Prud\u00EAncia',
+        'Jardim S\u00E3o Lu\u00EDs',
+        'Jardim dos \u00C1lamos',
+        'Jardim \u00C2ngela',
+        'Jurubatuba',
+        "M'Boi Mirim",
+        'Marsilac',
+        'Mirand\u00F3polis',
+        'Moema',
+        'Moema / Vila Mariana',
+        'Morumbi (parte sul)',
+        'Para\u00EDso',
+        'Parelheiros',
+        'Parque Bristol',
+        'Parque Cocaia',
+        'Parque Independ\u00EAncia',
+        'Parque Santo Ant\u00F4nio',
+        'Pedreira',
+        'Pirajussara',
+        'Sacom\u00E3',
+        'Santo Amaro',
+        'Sa\u00FAde',
+        'Socorro',
+        'Valo Velho',
+        'Vila Andrade',
+        'Vila Clementino',
+        'Vila Guarani',
+        'Vila Joaniza',
+        'Vila Mariana',
+        'Vila Mascote',
+        'Vila Nova Concei\u00E7\u00E3o',
+        'Vila Parque Jabaquara',
+        'Vila das Belezas',
+        'Vila das Merc\u00EAs',
+        '\u00C1gua Funda',
+      ]
+    > &
+      Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true;

@@ -133,18 +133,6 @@
         "description": "Digite Somente o Valor do Aluguel (sem o R$)"
       }
     },
-    "Bairro": {
-      "type": "customField",
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
-      "customField": "plugin::superfields.tooltip-field",
-      "options": {
-        "description": "Digite a região do imóvel"
-      }
-    },
     "Quartos": {
       "type": "customField",
       "pluginOptions": {
@@ -251,6 +239,85 @@
           "localized": true
         }
       }
+    },
+    "Bairro": {
+      "type": "enumeration",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "required": true,
+      "enum": [
+        "Alto da Boa Vista",
+        "Americanópolis",
+        "Barragem",
+        "Brooklin",
+        "Brooklin Novo",
+        "Brooklin Velho",
+        "Campo Belo",
+        "Campo Grande",
+        "Campo Limpo",
+        "Capela do Socorro",
+        "Capão Redondo",
+        "Chácara Klabin",
+        "Chácara Santo Antônio",
+        "Cidade Ademar",
+        "Cidade Dutra",
+        "Cidade Vargas",
+        "Colônia Paulista",
+        "Conceição",
+        "Cupecê",
+        "Cursino",
+        "Grajaú",
+        "Granja Julieta",
+        "Heliópolis",
+        "Ibirapuera",
+        "Indianópolis",
+        "Interlagos",
+        "Ipiranga",
+        "Jabaquara",
+        "Jardim Casablanca",
+        "Jardim Guanhembu",
+        "Jardim Ipanema",
+        "Jardim Marajoara",
+        "Jardim Miriam",
+        "Jardim Prudência",
+        "Jardim São Luís",
+        "Jardim dos Álamos",
+        "Jardim Ângela",
+        "Jurubatuba",
+        "M'Boi Mirim",
+        "Marsilac",
+        "Mirandópolis",
+        "Moema",
+        "Moema / Vila Mariana",
+        "Morumbi (parte sul)",
+        "Paraíso",
+        "Parelheiros",
+        "Parque Bristol",
+        "Parque Cocaia",
+        "Parque Independência",
+        "Parque Santo Antônio",
+        "Pedreira",
+        "Pirajussara",
+        "Sacomã",
+        "Santo Amaro",
+        "Saúde",
+        "Socorro",
+        "Valo Velho",
+        "Vila Andrade",
+        "Vila Clementino",
+        "Vila Guarani",
+        "Vila Joaniza",
+        "Vila Mariana",
+        "Vila Mascote",
+        "Vila Nova Conceição",
+        "Vila Parque Jabaquara",
+        "Vila das Belezas",
+        "Vila das Mercês",
+        "Água Funda"
+      ]
     }
   }
 }
