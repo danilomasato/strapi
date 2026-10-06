@@ -665,6 +665,7 @@ export interface ApiAnuncioAnuncio extends Struct.CollectionTypeSchema {
       'oneToMany',
       'api::anuncio.anuncio'
     >;
+    media_folder_id: Schema.Attribute.Integer;
     nome_exibicao: Schema.Attribute.String &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
