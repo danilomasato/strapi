@@ -801,6 +801,7 @@ export interface ApiBrokerBroker extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     creci: Schema.Attribute.BigInteger;
+    credencialCreci: Schema.Attribute.Media<'images' | 'files'>;
     email: Schema.Attribute.Email;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<

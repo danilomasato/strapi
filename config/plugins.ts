@@ -20,4 +20,8 @@ export default ({env}) => ({
   "sortable-entries": {
     enabled: true,
   },
+  'broker-admin': {
+    enabled: true,
+    resolve: './src/plugins/broker-admin',
+  },
 });

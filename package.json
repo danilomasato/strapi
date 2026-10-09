@@ -13,7 +13,9 @@
     "start": "strapi start",
     "strapi": "strapi",
     "upgrade": "npx @strapi/upgrade latest",
-    "upgrade:dry": "npx @strapi/upgrade latest --dry"
+    "upgrade:dry": "npx @strapi/upgrade latest --dry",
+    "postinstall": "npm rebuild better-sqlite3",
+    "better-sqlite3:fix": "cd node_modules/better-sqlite3 && npx prebuild-install --runtime=node --target=22.22.3 --verbose"
   },
   "dependencies": {
     "@strapi/plugin-cloud": "5.23.0",

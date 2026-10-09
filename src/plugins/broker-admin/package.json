@@ -1,0 +1,10 @@
+{
+    "name": "broker-admin",
+    "version": "1.0.0",
+    "private": true,
+    "description": "Administração personalizada dos corretores",
+    "type": "module",
+    "strapi": {
+        "kind": "plugin"
+    }
+}
