@@ -205,3 +205,12 @@ button[id*="trigger-published"] span:first-child::before {
   border-color: #9ca3af !important;
   box-shadow: 0 0 0 2px rgba(156, 163, 175, 0.12) !important;
 }
+
+/* Coleção corretores, tipo e user */
+a[href="/admin/content-manager/collection-types/api::broker.broker"],
+a[href="/admin/content-manager/collection-types/api::tipo.tipo"],
+a[href="/admin/content-manager/collection-types/plugin::users-permissions.user"],
+a[href="https://market.strapi.io"],
+a[href="/admin/plugins/content-type-builder"] {
+  display: none !important;
+}
