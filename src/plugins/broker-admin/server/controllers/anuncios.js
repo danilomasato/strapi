@@ -1,211 +1,193 @@
+const getAuthorizedAdmin = async (ctx) => {
+  const currentUser = ctx.state.user;
 
-export default ({ strapi }) => {
-  const getAuthorizedAdmin = async (ctx) => {
-    const currentUser = ctx.state.user;
+  if (!currentUser?.id) {
+    ctx.unauthorized('Autenticação necessária.');
+    return null;
+  }
 
-    if (!currentUser?.id) {
-      ctx.unauthorized('Autenticação necessária.');
-      return null;
-    }
+  const adminUser = await strapi.db.query('admin::user').findOne({
+    where: { id: currentUser.id },
+    populate: { roles: true },
+    select: ['id', 'email', 'isActive'],
+  });
 
-    const adminUser = await strapi.db.query('admin::user').findOne({
-      where: { id: currentUser.id },
-      populate: { roles: true },
-      select: ['id', 'email', 'isActive'],
-    });
+  if (!adminUser || adminUser.isActive === false) {
+    ctx.forbidden('Usuário administrativo inativo ou não encontrado.');
+    return null;
+  }
 
-    if (!adminUser || !adminUser.isActive) {
-      ctx.forbidden('Usuário administrativo inválido ou inativo.');
-      return null;
-    }
+  const email = String(adminUser.email || '').trim().toLowerCase();
+  const roles = adminUser.roles || [];
 
-    const email = String(adminUser.email || '').trim().toLowerCase();
-    const roles = adminUser.roles || [];
+  const isVania = email === 'vania@tudosobreap.com';
+  const isSuperAdmin = roles.some(
+    (role) => role.code === 'strapi-super-admin'
+  );
 
-    const isVania = email === 'vania@tudosobreap.com';
-    const isSuperAdmin = roles.some(
-      (role) => role.code === 'strapi-super-admin'
-    );
+  if (!isVania && !isSuperAdmin) {
+    ctx.forbidden('Você não tem permissão para acessar esta página.');
+    return null;
+  }
 
-    if (!isVania && !isSuperAdmin) {
-      strapi.log.warn(
-        `[broker-admin] Acesso negado ao usuário administrativo ${email || adminUser.id}.`
+  return adminUser;
+};
+
+export default {
+  async checkAuthorization(ctx) {
+    try {
+      const adminUser = await getAuthorizedAdmin(ctx);
+
+      if (!adminUser) return;
+
+      ctx.body = {
+        authorized: true,
+        email: adminUser.email,
+      };
+    } catch (error) {
+      strapi.log.error(
+        '[broker-admin] Erro ao verificar autorização:',
+        error
       );
 
-      ctx.forbidden(
-        'Você não tem permissão para acessar a ficha cadastral dos corretores.'
+      ctx.internalServerError(
+        'O servidor do Strapi apresentou uma falha temporária. Tente novamente.'
+      );
+    }
+  },
+
+  async findBrokers(ctx) {
+    try {
+      const adminUser = await getAuthorizedAdmin(ctx);
+
+      if (!adminUser) return;
+
+      const brokers = await strapi.db
+        .query('api::broker.broker')
+        .findMany({
+          orderBy: { id: 'desc' },
+        });
+
+      ctx.body = { data: brokers };
+    } catch (error) {
+      strapi.log.error(
+        '[broker-admin] Erro ao consultar corretores:',
+        error
       );
 
-      return null;
+      ctx.internalServerError(
+        'O servidor do Strapi apresentou uma falha temporária. Tente novamente.'
+      );
     }
+  },
 
-    return adminUser;
-  };
+  async findBroker(ctx) {
+    try {
+      const adminUser = await getAuthorizedAdmin(ctx);
 
-  return {
-    async checkAuthorization(ctx) {
-      try {
-        const adminUser = await getAuthorizedAdmin(ctx);
+      if (!adminUser) return;
 
-        if (!adminUser) return;
+      const { brokerDocumentId } = ctx.params;
 
-        ctx.body = { authorized: true };
-      } catch (error) {
-        strapi.log.error(
-          '[broker-admin] Erro ao verificar autorização:',
-          error
-        );
-
-        ctx.internalServerError(
-          'Não foi possível verificar a autorização.'
-        );
+      if (!brokerDocumentId) {
+        return ctx.badRequest('Identificador do corretor não informado.');
       }
-    },
 
-    async findBrokers(ctx) {
-      try {
-        const adminUser = await getAuthorizedAdmin(ctx);
+      const broker = await strapi.db
+        .query('api::broker.broker')
+        .findOne({
+          where: { documentId: brokerDocumentId },
+        });
 
-        if (!adminUser) return;
-
-        const brokers = await strapi.db
-          .query('api::broker.broker')
-          .findMany({
-            select: [
-              'id',
-              'documentId',
-              'nome',
-              'name',
-              'email',
-              'telefone',
-              'phone',
-              'creci',
-            ],
-            orderBy: { id: 'desc' },
-          });
-
-        ctx.body = { data: brokers };
-      } catch (error) {
-        strapi.log.error(
-          '[broker-admin] Erro ao consultar corretores:',
-          error
-        );
-
-        ctx.internalServerError(
-          'Não foi possível consultar os corretores.'
-        );
+      if (!broker) {
+        return ctx.notFound('Corretor não encontrado.');
       }
-    },
 
-    async findBroker(ctx) {
-      try {
-        const adminUser = await getAuthorizedAdmin(ctx);
+      ctx.body = { data: broker };
+    } catch (error) {
+      strapi.log.error(
+        '[broker-admin] Erro ao consultar detalhe do corretor:',
+        error
+      );
 
-        if (!adminUser) return;
+      ctx.internalServerError(
+        'O servidor do Strapi apresentou uma falha temporária. Tente novamente.'
+      );
+    }
+  },
 
-        const { brokerDocumentId } = ctx.params;
+  async findByBroker(ctx) {
+    try {
+      const adminUser = await getAuthorizedAdmin(ctx);
 
-        if (!brokerDocumentId) {
-          return ctx.badRequest(
-            'O identificador do corretor é obrigatório.'
-          );
-        }
+      if (!adminUser) return;
 
-        const broker = await strapi.db
-          .query('api::broker.broker')
-          .findOne({
-            where: { documentId: brokerDocumentId },
-          });
+      const { brokerDocumentId } = ctx.params;
 
-        if (!broker) {
-          return ctx.notFound('Corretor não encontrado.');
-        }
-
-        ctx.body = { data: broker };
-      } catch (error) {
-        strapi.log.error(
-          '[broker-admin] Erro ao consultar detalhes do corretor:',
-          error
-        );
-
-        ctx.internalServerError(
-          'Não foi possível consultar os detalhes do corretor.'
-        );
+      if (!brokerDocumentId) {
+        return ctx.badRequest('Identificador do corretor não informado.');
       }
-    },
 
-    async findByBroker(ctx) {
-      try {
-        const adminUser = await getAuthorizedAdmin(ctx);
+      const broker = await strapi.db
+        .query('api::broker.broker')
+        .findOne({
+          where: { documentId: brokerDocumentId },
+          select: ['documentId', 'email'],
+        });
 
-        if (!adminUser) return;
+      if (!broker) {
+        return ctx.notFound('Corretor não encontrado.');
+      }
 
-        const { brokerDocumentId } = ctx.params;
-        const anuncioUid = 'api::anuncio.anuncio';
+      if (!broker.email) {
+        ctx.body = { data: [] };
+        return;
+      }
 
-        if (!brokerDocumentId) {
-          return ctx.badRequest(
-            'O identificador do corretor é obrigatório.'
-          );
-        }
-
-        const broker = await strapi.db
-          .query('api::broker.broker')
-          .findOne({
-            where: { documentId: brokerDocumentId },
-            select: ['documentId', 'email'],
-          });
-
-        if (!broker) {
-          return ctx.notFound('Corretor não encontrado.');
-        }
-
-        if (!broker.email) {
-          ctx.body = {
-            data: [],
-            message: 'Nenhum anúncio foi encontrado.',
-          };
-          return;
-        }
-
-        const brokerAdminUser = await strapi.db
-          .query('admin::user')
-          .findOne({
-            where: {
-              email: { $eqi: broker.email },
+      const brokerAdmin = await strapi.db
+        .query('admin::user')
+        .findOne({
+          where: {
+            email: {
+              $eqi: broker.email,
             },
-            select: ['id', 'email'],
-          });
+          },
+          select: ['id'],
+        });
 
-        if (!brokerAdminUser) {
-          ctx.body = {
-            data: [],
-            message: 'Nenhum anúncio foi encontrado.',
-          };
-          return;
-        }
+      if (!brokerAdmin) {
+        ctx.body = { data: [] };
+        return;
+      }
 
-        const metadata = strapi.db.metadata.get(anuncioUid);
-        const tableName = metadata.tableName;
+      const createdByRows = await strapi.db
+        .connection('admin_users')
+        .select('id')
+        .where('id', brokerAdmin.id);
 
-        const registros = await strapi.db
-          .connection(tableName)
-          .select('id', 'created_by_id', 'document_id')
-          .where('created_by_id', brokerAdminUser.id)
-          .orderBy('id', 'desc');
+      if (!createdByRows.length) {
+        ctx.body = { data: [] };
+        return;
+      }
 
-        const ids = registros.map((registro) => registro.id);
+      const announcementRows = await strapi.db
+        .connection('anuncios')
+        .select('id')
+        .where('created_by_id', brokerAdmin.id);
 
-        if (ids.length === 0) {
-          ctx.body = {
-            data: [],
-            message: 'Nenhum anúncio foi encontrado.',
-          };
-          return;
-        }
+      const announcementIds = announcementRows.map((row) => row.id);
 
-        const anuncios = await strapi.db.query(anuncioUid).findMany({
-          where: { id: { $in: ids } },
+      if (!announcementIds.length) {
+        ctx.body = { data: [] };
+        return;
+      }
+
+      const anuncios = await strapi.db
+        .query('api::anuncio.anuncio')
+        .findMany({
+          where: {
+            id: { $in: announcementIds },
+          },
           select: [
             'id',
             'documentId',
@@ -217,48 +199,40 @@ export default ({ strapi }) => {
             'locale',
             'createdAt',
           ],
-          orderBy: { createdAt: 'desc' },
+          orderBy: { id: 'desc' },
         });
 
-        const anunciosPorDocumento = new Map();
+      const uniqueAnuncios = Array.from(
+        new Map(
+          anuncios.map((anuncio) => [
+            anuncio.documentId || anuncio.id,
+            anuncio,
+          ])
+        ).values()
+      );
 
-        for (const anuncio of anuncios) {
-          const chave = anuncio.documentId
-            ? `document-${anuncio.documentId}`
-            : `id-${anuncio.id}`;
+      ctx.body = {
+        data: uniqueAnuncios.map((anuncio) => ({
+          id: anuncio.id,
+          documentId: anuncio.documentId,
+          codigo: anuncio.codigo,
+          nome_exibicao: anuncio.nome_exibicao,
+          titulo: anuncio.titulo,
+          Tipo_de_Anuncio: anuncio.Tipo_de_Anuncio,
+          publishedAt: anuncio.publishedAt,
+          locale: anuncio.locale,
+          createdAt: anuncio.createdAt,
+        })),
+      };
+    } catch (error) {
+      strapi.log.error(
+        '[broker-admin] Erro ao consultar anúncios do corretor:',
+        error
+      );
 
-          if (!anunciosPorDocumento.has(chave)) {
-            anunciosPorDocumento.set(chave, anuncio);
-          }
-        }
-
-        ctx.body = {
-          data: Array.from(anunciosPorDocumento.values()).map(
-            (anuncio) => ({
-              id: anuncio.id,
-              documentId: anuncio.documentId,
-              codigo: anuncio.codigo || '—',
-              imovel:
-                anuncio.nome_exibicao ||
-                anuncio.titulo ||
-                'Sem título',
-              tipo: anuncio.Tipo_de_Anuncio || '—',
-              status: anuncio.publishedAt ? 'Publicado' : 'Rascunho',
-              publishedAt: anuncio.publishedAt,
-              locale: anuncio.locale || null,
-            })
-          ),
-        };
-      } catch (error) {
-        strapi.log.error(
-          '[broker-admin] Erro ao consultar anúncios do corretor:',
-          error
-        );
-
-        ctx.internalServerError(
-          'Não foi possível consultar os anúncios do corretor.'
-        );
-      }
-    },
-  };
+      ctx.internalServerError(
+        'O servidor do Strapi apresentou uma falha temporária. Tente novamente.'
+      );
+    }
+  },
 };
