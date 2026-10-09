@@ -69,6 +69,23 @@ export default ({ strapi }) => ({
         `[broker-admin] Tabela de anúncios: ${tableName}`
       );
 
+      // DIAGNÓSTICO TEMPORÁRIO: quantidade total de anúncios.
+      const totalAnuncios = await strapi.db
+        .connection(tableName)
+        .count('* as total')
+        .first();
+
+      // DIAGNÓSTICO TEMPORÁRIO: amostra dos últimos 10 registros.
+      const amostra = await strapi.db
+        .connection(tableName)
+        .select('id', 'created_by_id', 'document_id')
+        .orderBy('id', 'desc')
+        .limit(10);
+
+      strapi.log.info(
+        `[broker-admin] Diagnóstico: total=${totalAnuncios?.total ?? 0}; amostra=${JSON.stringify(amostra)}`
+      );
+
       const registros = await strapi.db
         .connection(tableName)
         .select('id', 'created_by_id', 'document_id')
@@ -117,12 +134,6 @@ export default ({ strapi }) => ({
           },
         });
 
-      /*
-       * Agrupa os registros pelo documentId.
-       * Se houver várias versões do mesmo documento,
-       * mantém somente a primeira encontrada, que é a mais recente
-       * conforme a ordenação da consulta.
-       */
       const anunciosPorDocumento = new Map();
 
       for (const anuncio of anuncios) {
