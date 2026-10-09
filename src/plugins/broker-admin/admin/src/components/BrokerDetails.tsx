@@ -1,3 +1,4 @@
+
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useFetchClient } from '@strapi/strapi/admin';
@@ -55,14 +56,16 @@ type ApiError = {
   };
 };
 
-const BROKER_ENDPOINT =
-  '/content-manager/collection-types/api::broker.broker';
+type AuthorizationResponse = {
+  authorized?: boolean;
+};
 
+const BROKER_ENDPOINT = '/broker-admin/brokers';
 const ANNOUNCEMENTS_ENDPOINT = '/broker-admin/anuncios';
+const AUTHORIZATION_ENDPOINT = '/broker-admin/authorization';
 
 const getBrokerValue = (broker: Broker, key: string) => {
   const attributes = broker.attributes || {};
-
   return broker[key as keyof Broker] ?? attributes[key];
 };
 
@@ -70,10 +73,8 @@ const getFullName = (broker: Broker) => {
   const nome = getBrokerValue(broker, 'nome');
   const sobrenome = getBrokerValue(broker, 'sobrenome');
 
-  return [nome, sobrenome]
-    .filter(Boolean)
-    .join(' ')
-    .trim() || 'Nome não informado';
+  return [nome, sobrenome].filter(Boolean).join(' ').trim()
+    || 'Nome não informado';
 };
 
 const normalizeSearchText = (value: unknown): string =>
@@ -100,6 +101,7 @@ const getFileUrl = (
 const getApiErrorMessage = (error: unknown): string => {
   const err = error as ApiError;
   const status = err?.response?.status ?? err?.status;
+
   const message =
     err?.response?.data?.error?.message
     ?? err?.response?.data?.message
@@ -110,11 +112,11 @@ const getApiErrorMessage = (error: unknown): string => {
   }
 
   if (status === 403) {
-    return 'Seu usuário não tem permissão para consultar os corretores.';
+    return 'Seu usuário não tem permissão para consultar a ficha cadastral dos corretores.';
   }
 
   if (status === 404) {
-    return 'A rota de consulta dos corretores não foi encontrada. Verifique a configuração do Content Manager.';
+    return 'A rota solicitada não foi encontrada. Verifique as rotas do servidor do plugin broker-admin.';
   }
 
   if (status === 429) {
@@ -133,10 +135,10 @@ const getApiErrorMessage = (error: unknown): string => {
   }
 
   if (message) {
-    return `Falha ao consultar os corretores: ${message}`;
+    return `Falha ao consultar os dados: ${message}`;
   }
 
-  return 'Não foi possível consultar os corretores. Tente novamente.';
+  return 'Não foi possível consultar os dados. Tente novamente.';
 };
 
 const extractList = (payload: unknown): Broker[] => {
@@ -149,12 +151,7 @@ const extractList = (payload: unknown): Broker[] => {
   }
 
   const data = payload as Record<string, unknown>;
-
-  const candidates = [
-    data.results,
-    data.data,
-    data.entries,
-  ];
+  const candidates = [data.results, data.data, data.entries];
 
   for (const candidate of candidates) {
     if (Array.isArray(candidate)) {
@@ -184,14 +181,20 @@ const extractList = (payload: unknown): Broker[] => {
 const BrokerDetails = () => {
   const { get } = useFetchClient();
 
+  const [authorized, setAuthorized] = useState(false);
+  const [checkingAuthorization, setCheckingAuthorization] = useState(true);
+  const [authorizationError, setAuthorizationError] = useState('');
+
   const [brokers, setBrokers] = useState<Broker[]>([]);
   const [selectedBroker, setSelectedBroker] = useState<Broker | null>(null);
   const [credential, setCredential] = useState<MediaFile | null>(null);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+
   const [searchName, setSearchName] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [loadingAnnouncements, setLoadingAnnouncements] = useState(false);
+
   const [error, setError] = useState('');
   const [announcementsError, setAnnouncementsError] = useState('');
   const [announcementsMessage, setAnnouncementsMessage] = useState('');
@@ -209,32 +212,57 @@ const BrokerDetails = () => {
     );
   }, [brokers, safeSearchName]);
 
+  const checkAuthorization = useCallback(async () => {
+    setCheckingAuthorization(true);
+    setAuthorized(false);
+    setAuthorizationError('');
+
+    try {
+      const response = await get(AUTHORIZATION_ENDPOINT);
+      const payload = response.data as AuthorizationResponse;
+
+      if (payload?.authorized !== true) {
+        setAuthorizationError(
+          'Seu usuário não tem permissão para acessar esta página.'
+        );
+        return false;
+      }
+
+      setAuthorized(true);
+      return true;
+    } catch (err) {
+      console.error('Erro ao verificar autorização:', err);
+      setAuthorizationError(getApiErrorMessage(err));
+      return false;
+    } finally {
+      setCheckingAuthorization(false);
+    }
+  }, [get]);
+
   const loadBrokers = useCallback(async () => {
+    if (!authorized) {
+      return;
+    }
+
     setLoading(true);
     setError('');
 
     try {
-      const response = await get(BROKER_ENDPOINT, {
-        params: {
-          page: 1,
-          pageSize: 100,
-          sort: 'nome:ASC',
-          populate: 'credencialCreci',
-        },
-      });
-
-      const results = extractList(response.data);
-
-      setBrokers(results);
+      const response = await get(BROKER_ENDPOINT);
+      setBrokers(extractList(response.data));
     } catch (err) {
       console.error('Erro ao carregar corretores:', err);
       setError(getApiErrorMessage(err));
     } finally {
       setLoading(false);
     }
-  }, [get]);
+  }, [authorized, get]);
 
   const loadAnnouncements = useCallback(async (brokerDocumentId: string) => {
+    if (!authorized) {
+      return;
+    }
+
     setLoadingAnnouncements(true);
     setAnnouncements([]);
     setAnnouncementsError('');
@@ -246,16 +274,13 @@ const BrokerDetails = () => {
       );
 
       const payload = response.data;
-      const results = Array.isArray(payload)
-        ? payload
-        : payload?.data;
+      const results = Array.isArray(payload) ? payload : payload?.data;
 
       if (!Array.isArray(results)) {
         throw new Error('A API retornou uma lista de anúncios inválida.');
       }
 
       setAnnouncements(results);
-
       setAnnouncementsMessage(
         typeof payload?.message === 'string' ? payload.message : ''
       );
@@ -265,9 +290,13 @@ const BrokerDetails = () => {
     } finally {
       setLoadingAnnouncements(false);
     }
-  }, [get]);
+  }, [authorized, get]);
 
   const openBroker = useCallback(async (broker: Broker) => {
+    if (!authorized) {
+      return;
+    }
+
     setSelectedBroker(broker);
     setCredential(null);
     setAnnouncements([]);
@@ -279,12 +308,7 @@ const BrokerDetails = () => {
 
     try {
       const response = await get(
-        `${BROKER_ENDPOINT}/${encodeURIComponent(broker.documentId)}`,
-        {
-          params: {
-            populate: 'credencialCreci',
-          },
-        }
+        `${BROKER_ENDPOINT}/${encodeURIComponent(broker.documentId)}`
       );
 
       const payload = response.data;
@@ -312,11 +336,17 @@ const BrokerDetails = () => {
     }
 
     await loadAnnouncements(broker.documentId);
-  }, [get, loadAnnouncements]);
+  }, [authorized, get, loadAnnouncements]);
 
   useEffect(() => {
-    void loadBrokers();
-  }, [loadBrokers]);
+    void checkAuthorization();
+  }, [checkAuthorization]);
+
+  useEffect(() => {
+    if (authorized) {
+      void loadBrokers();
+    }
+  }, [authorized, loadBrokers]);
 
   const closeBroker = () => {
     setSelectedBroker(null);
@@ -340,16 +370,52 @@ const BrokerDetails = () => {
   };
 
   const name = selectedBroker ? getFullName(selectedBroker) : '';
-
   const email = selectedBroker
     ? getBrokerValue(selectedBroker, 'email')
     : '';
-
   const creci = selectedBroker
     ? getBrokerValue(selectedBroker, 'creci')
     : '';
 
   const credentialUrl = getFileUrl(credential);
+
+  if (checkingAuthorization) {
+    return (
+      <Box padding={8}>
+        <Flex justifyContent="center" padding={8}>
+          <Loader>Verificando permissão de acesso...</Loader>
+        </Flex>
+      </Box>
+    );
+  }
+
+  if (!authorized) {
+    return (
+      <Box padding={8}>
+        <Box padding={5} background="danger100" hasRadius>
+          <Typography variant="beta">
+            Acesso não autorizado
+          </Typography>
+
+          <Box paddingTop={2}>
+            <Typography textColor="danger700">
+              {authorizationError
+                || 'Não foi possível confirmar sua permissão de acesso.'}
+            </Typography>
+          </Box>
+
+          <Box paddingTop={4}>
+            <Button
+              variant="secondary"
+              onClick={() => void checkAuthorization()}
+            >
+              Verificar novamente
+            </Button>
+          </Box>
+        </Box>
+      </Box>
+    );
+  }
 
   return (
     <Box padding={8}>
@@ -416,7 +482,7 @@ const BrokerDetails = () => {
                 name="searchBroker"
                 aria-label="Buscar corretor por nome"
                 placeholder="Digite o nome ou sobrenome..."
-                value={typeof searchName === 'string' ? searchName : ''}
+                value={searchName}
                 onChange={handleSearchChange}
               />
 
@@ -449,7 +515,7 @@ const BrokerDetails = () => {
           ) : filteredBrokers.length === 0 ? (
             <Box padding={5} background="neutral100" hasRadius>
               <Typography>
-                Nenhum corretor corresponde à busca por "{String(searchName)}".
+                Nenhum corretor corresponde à busca por "{searchName}".
               </Typography>
 
               <Box paddingTop={3}>
