@@ -239,3 +239,7 @@ div:has(> div > input[name="media_folder_id"]) {
   outline: 3px solid red !important;
 }
 
+body {
+  outline: 5px solid red !important;
+}
+
