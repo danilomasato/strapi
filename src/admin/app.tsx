@@ -137,6 +137,34 @@ export default {
 
     document.head.appendChild(style);
 
+    const traduzirAbasStatus = () => {
+      const traducoes: Record<string, string> = {
+        draft: 'Rascunho',
+        published: 'Publicado',
+      };
+
+      document
+        .querySelectorAll('[role="tablist"][aria-label="Document status"] [role="tab"] span')
+        .forEach((elemento) => {
+          const texto = elemento.textContent?.trim();
+
+          if (texto && traducoes[texto]) {
+            elemento.textContent = traducoes[texto];
+          }
+        });
+    };
+
+    traduzirAbasStatus();
+
+    const observer = new MutationObserver(() => {
+      traduzirAbasStatus();
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+
     console.log('Admin TSA Imóveis inicializado');
   },
 };
