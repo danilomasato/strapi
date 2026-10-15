@@ -214,3 +214,10 @@ a[href="https://market.strapi.io"],
 a[href="/admin/plugins/content-type-builder"] {
   display: none !important;
 }
+
+div:has(> div > input[name="codigo"]),
+div:has(> div > input[name="sortOrder"]),
+div:has(> div > input[name="nome_exibicao"]),
+div:has(> div > input[name="media_folder_id"]) {
+  display: none !important;
+}

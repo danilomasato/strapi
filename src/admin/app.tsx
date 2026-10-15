@@ -55,6 +55,16 @@ export default {
         'content-manager.HeaderLayout.status.draft': 'Rascunho',
         'content-manager.utils.data-status.draft': 'Rascunho',
 
+        'containers.List.draft': 'Rascunho',
+        'containers.List.published': 'Publicado',
+        'relation.publicationState.draft': 'Rascunho',
+        'relation.publicationState.published': 'Publicado',
+        'containers.edit.tabs.draft': 'Rascunho',
+        'containers.edit.tabs.published': 'Publicado',
+        'containers.edit.information.last-published.label': 'Publicado',
+        'components.Select.draft-info-title': 'Rascunho',
+        'components.Select.publish-info-title': 'Publicado',
+
         'content-manager.actions.discard.label': 'Descartar alterações',
         'content-manager.actions.discard.title': 'Limpar alterações não salvas',
         'content-manager.components.Header.actions.discard': 'Cancelar mudanças',
