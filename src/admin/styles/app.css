@@ -235,3 +235,7 @@ div:has(> div > input[name="media_folder_id"]) {
   pointer-events: none !important;
 }
 
+#strapi a[aria-label="Publicar Anúncios"] {
+  outline: 3px solid red !important;
+}
+
