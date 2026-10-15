@@ -34,8 +34,20 @@ export default {
         'content-manager.page.content.edit.title': 'Editando Documento',
         'content-manager.containers.EditView.header.title.new': 'Novo Registro',
         'content-manager.containers.Edit.title.new': 'Criar Novo Registro',
+        'content-manager.containers.edit.title.new': 'Criar anúncio',
         'content-manager.page.content.create.title': 'Adicionar Registro',
         'content-manager.EditView.header.title.new': 'Novo Item',
+
+        'HeaderLayout.button.label-add-entry': 'Criar Novo Anúncio',
+
+        'New entry': 'Novo anúncio',
+        'Create an entry': 'Criar anúncio',
+        'Create new entry': 'Criar anúncio',
+
+        'content-manager.actions.create.label': 'Criar Novo Anúncio',
+        'content-manager.containers.ListView.addNewEntry': 'Criar Novo Anúncio',
+        'content-manager.pages.ListView.header-subtitle':
+          '{number, plural, =0 {Nenhum Imóvel} one {# Imóvel encontrado} other {# Imóveis encontrados}}',
 
         'content-manager.containers.Edit.reset': 'Resetar formulário',
         'content-manager.containers.Edit.submit.draft': 'Salvar Alterações',
@@ -92,16 +104,11 @@ export default {
         'app.components.HomePage.lastEditedEntries': 'Atividade Recente',
         'HomePage.last-edited-entries': 'Atividade Recente',
         'content-manager.containers.HomePage.last-edited-entries': 'Atividade Recente',
-
-        'content-manager.pages.ListView.header-subtitle':
-          '{number, plural, =0 {Nenhum Imóvel} one {# Imóvel encontrado} other {# Imóveis encontrados}}',
       },
     },
   },
 
   bootstrap(app: StrapiApp) {
     console.log('Admin TSA Imóveis inicializado');
-
-    
   },
 };
