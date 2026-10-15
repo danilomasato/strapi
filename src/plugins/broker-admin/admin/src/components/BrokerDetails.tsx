@@ -1,4 +1,3 @@
-
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useFetchClient } from '@strapi/strapi/admin';
@@ -35,11 +34,15 @@ type Announcement = {
   id?: number;
   documentId?: string;
   codigo?: string;
+  titulo?: string;
+  nome_exibicao?: string;
   imovel?: string;
+  Tipo_de_Anuncio?: string | { nome?: string; name?: string } | null;
   tipo?: string;
   status?: string;
   publishedAt?: string | null;
   locale?: string | null;
+  createdAt?: string;
 };
 
 type ApiError = {
@@ -178,6 +181,53 @@ const extractList = (payload: unknown): Broker[] => {
   throw new Error('A resposta da API não contém uma lista de corretores.');
 };
 
+const getAnnouncementTitle = (announcement: Announcement): string => {
+  const candidates = [
+    announcement.titulo,
+    announcement.nome_exibicao,
+    announcement.imovel,
+  ];
+
+  for (const candidate of candidates) {
+    if (typeof candidate === 'string' && candidate.trim()) {
+      return candidate.trim();
+    }
+  }
+
+  return 'Sem título';
+};
+
+const getAnnouncementType = (announcement: Announcement): string => {
+  const value = announcement.Tipo_de_Anuncio ?? announcement.tipo;
+
+  if (typeof value === 'string' && value.trim()) {
+    return value.trim();
+  }
+
+  if (value && typeof value === 'object') {
+    return value.nome || value.name || '—';
+  }
+
+  return '—';
+};
+
+const getAnnouncementStatus = (announcement: Announcement): string => {
+  if (announcement.publishedAt) {
+    return 'Publicado';
+  }
+
+  return announcement.status || 'Rascunho';
+};
+
+const normalizeAnnouncement = (
+  announcement: Announcement
+): Announcement => ({
+  ...announcement,
+  imovel: getAnnouncementTitle(announcement),
+  tipo: getAnnouncementType(announcement),
+  status: getAnnouncementStatus(announcement),
+});
+
 const BrokerDetails = () => {
   const { get } = useFetchClient();
 
@@ -280,7 +330,10 @@ const BrokerDetails = () => {
         throw new Error('A API retornou uma lista de anúncios inválida.');
       }
 
-      setAnnouncements(results);
+      setAnnouncements(
+        results.map((item: Announcement) => normalizeAnnouncement(item))
+      );
+
       setAnnouncementsMessage(
         typeof payload?.message === 'string' ? payload.message : ''
       );
@@ -845,7 +898,7 @@ const BrokerDetails = () => {
                                   fontSize: '14px',
                                 }}
                               >
-                                {announcement.imovel || 'Sem título'}
+                                {getAnnouncementTitle(announcement)}
                               </td>
 
                               <td
@@ -855,7 +908,7 @@ const BrokerDetails = () => {
                                   fontSize: '14px',
                                 }}
                               >
-                                {announcement.tipo || '—'}
+                                {getAnnouncementType(announcement)}
                               </td>
 
                               <td
@@ -866,10 +919,7 @@ const BrokerDetails = () => {
                                   fontSize: '14px',
                                 }}
                               >
-                                {announcement.status
-                                  || (announcement.publishedAt
-                                    ? 'Publicado'
-                                    : 'Rascunho')}
+                                {getAnnouncementStatus(announcement)}
                               </td>
                             </tr>
                           ))}

@@ -90,7 +90,9 @@ export default {
 
       if (brokers.length !== uniqueBrokers.length) {
         strapi.log.warn(
-          `[broker-admin] ${brokers.length - uniqueBrokers.length} registro(s) repetido(s) removido(s) da resposta por documentId.`
+          `[broker-admin] ${
+            brokers.length - uniqueBrokers.length
+          } registro(s) repetido(s) removido(s) da resposta por documentId.`
         );
       }
 
@@ -213,25 +215,32 @@ export default {
 
       const announcementRows = await strapi.db
         .connection('anuncios')
-        .select('id')
+        .select('document_id')
         .where('created_by_id', brokerAdmin.id);
 
-      const announcementIds = announcementRows.map((row) => row.id);
+      const announcementDocumentIds = [
+        ...new Set(
+          announcementRows
+            .map((row) => row.document_id)
+            .filter(Boolean)
+        ),
+      ];
 
-      if (!announcementIds.length) {
+      if (!announcementDocumentIds.length) {
         ctx.body = { data: [] };
         return;
       }
 
-      const anuncios = await strapi.db
-        .query('api::anuncio.anuncio')
+      const anuncios = await strapi
+        .documents('api::anuncio.anuncio')
         .findMany({
-          where: {
-            id: { $in: announcementIds },
+          filters: {
+            documentId: {
+              $in: announcementDocumentIds,
+            },
           },
-          select: [
-            'id',
-            'documentId',
+          status: 'published',
+          fields: [
             'codigo',
             'nome_exibicao',
             'titulo',
@@ -240,31 +249,44 @@ export default {
             'locale',
             'createdAt',
           ],
-          orderBy: { id: 'desc' },
+          sort: ['createdAt:desc'],
         });
 
       const uniqueAnuncios = Array.from(
         new Map(
           anuncios.map((anuncio) => [
-            anuncio.documentId || anuncio.id,
+            anuncio.documentId,
             anuncio,
           ])
         ).values()
       );
 
-      ctx.body = {
-        data: uniqueAnuncios.map((anuncio) => ({
+      const data = uniqueAnuncios.map((anuncio) => {
+        const titulo =
+          (typeof anuncio.titulo === 'string' &&
+            anuncio.titulo.trim()) ||
+          (typeof anuncio.nome_exibicao === 'string' &&
+            anuncio.nome_exibicao.trim()) ||
+          'Sem título';
+
+        return {
           id: anuncio.id,
           documentId: anuncio.documentId,
           codigo: anuncio.codigo,
           nome_exibicao: anuncio.nome_exibicao,
-          titulo: anuncio.titulo,
+          titulo,
           Tipo_de_Anuncio: anuncio.Tipo_de_Anuncio,
           publishedAt: anuncio.publishedAt,
           locale: anuncio.locale,
           createdAt: anuncio.createdAt,
-        })),
-      };
+        };
+      });
+
+      strapi.log.info(
+        `[broker-admin] Anúncios publicados encontrados para ${broker.email}: ${data.length}`
+      );
+
+      ctx.body = { data };
     } catch (error) {
       strapi.log.error(
         '[broker-admin] Erro ao consultar anúncios do corretor:',
