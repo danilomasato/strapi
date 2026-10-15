@@ -135,6 +135,9 @@ export default {
         .query('api::broker.broker')
         .findOne({
           where: { documentId: brokerDocumentId },
+          populate: {
+            credencialCreci: true,
+          },
         });
 
       if (!broker) {
