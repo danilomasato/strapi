@@ -33,6 +33,122 @@ const getAuthorizedAdmin = async (ctx) => {
   return adminUser;
 };
 
+const diagnosticarAnuncios = async (brokerEmail, brokerAdminId) => {
+  const connection = strapi.db.connection;
+  const tabela = 'anuncios';
+
+  try {
+    const colunasDisponiveis = [
+      'id',
+      'document_id',
+      'created_by_id',
+      'updated_by_id',
+      'published_at',
+      'locale',
+      'titulo',
+      'nome_exibicao',
+      'codigo',
+    ];
+
+    const colunasExistentes = [];
+
+    for (const coluna of colunasDisponiveis) {
+      const existe = await connection.schema.hasColumn(
+        tabela,
+        coluna
+      );
+
+      if (existe) {
+        colunasExistentes.push(coluna);
+      }
+    }
+
+    strapi.log.info(
+      `[broker-admin][diagnostico] Colunas disponíveis: ${colunasExistentes.join(', ')}`
+    );
+
+    if (!colunasExistentes.includes('created_by_id')) {
+      strapi.log.warn(
+        '[broker-admin][diagnostico] A tabela anuncios não possui created_by_id.'
+      );
+      return;
+    }
+
+    const totalPorAutor = await connection(tabela)
+      .select('created_by_id')
+      .count('* as total')
+      .groupBy('created_by_id')
+      .orderBy('total', 'desc');
+
+    strapi.log.info(
+      `[broker-admin][diagnostico] Distribuição de anúncios por autor: ${JSON.stringify(
+        totalPorAutor.map((row) => ({
+          created_by_id: row.created_by_id,
+          total: Number(row.total),
+        }))
+      )}`
+    );
+
+    const totalGeral = await connection(tabela)
+      .count('* as total')
+      .first();
+
+    const totalDoAutorAtual = await connection(tabela)
+      .where('created_by_id', brokerAdminId)
+      .count('* as total')
+      .first();
+
+    strapi.log.info(
+      `[broker-admin][diagnostico] Resumo para ${brokerEmail}: ${JSON.stringify({
+        brokerAdminId,
+        totalRegistrosNaTabela: Number(totalGeral?.total || 0),
+        totalRegistrosDoAutorAtual: Number(
+          totalDoAutorAtual?.total || 0
+        ),
+      })}`
+    );
+
+    const colunasAmostra = colunasExistentes.filter(
+      (coluna) =>
+        coluna !== 'updated_by_id'
+    );
+
+    const amostra = await connection(tabela)
+      .select(colunasAmostra)
+      .orderBy('id', 'desc')
+      .limit(30);
+
+    strapi.log.info(
+      `[broker-admin][diagnostico] Amostra dos 30 registros mais recentes: ${JSON.stringify(
+        amostra.map((row) => ({
+          id: row.id,
+          document_id: row.document_id,
+          created_by_id: row.created_by_id,
+          published_at: row.published_at,
+          locale: row.locale,
+          titulo: row.titulo,
+          nome_exibicao: row.nome_exibicao,
+          codigo: row.codigo,
+        }))
+      )}`
+    );
+
+    const autoresDiferentes = amostra.filter(
+      (row) =>
+        Number(row.created_by_id) !== Number(brokerAdminId)
+    );
+
+    strapi.log.info(
+      `[broker-admin][diagnostico] Registros recentes com autoria diferente de ${brokerAdminId}: ${autoresDiferentes.length}`
+    );
+  } catch (error) {
+    strapi.log.error(
+      '[broker-admin][diagnostico] Falha ao investigar a tabela anuncios:',
+      error
+    );
+  }
+};
+
 export default {
   async checkAuthorization(ctx) {
     try {
@@ -183,6 +299,10 @@ export default {
       }
 
       if (!broker.email) {
+        strapi.log.warn(
+          `[broker-admin] Corretor ${brokerDocumentId} não possui e-mail cadastrado.`
+        );
+
         ctx.body = { data: [] };
         return;
       }
@@ -195,13 +315,31 @@ export default {
               $eqi: broker.email,
             },
           },
-          select: ['id'],
+          select: ['id', 'email'],
         });
 
       if (!brokerAdmin) {
+        strapi.log.warn(
+          `[broker-admin] Nenhum usuário administrativo encontrado para o e-mail do corretor ${broker.email}.`
+        );
+
         ctx.body = { data: [] };
         return;
       }
+
+      strapi.log.info(
+        `[broker-admin][diagnostico] Consultando anúncios: ${JSON.stringify({
+          brokerDocumentId,
+          brokerEmail: broker.email,
+          brokerAdminId: brokerAdmin.id,
+          requisitanteAdminId: adminUser.id,
+        })}`
+      );
+
+      await diagnosticarAnuncios(
+        broker.email,
+        brokerAdmin.id
+      );
 
       const createdByRows = await strapi.db
         .connection('admin_users')
@@ -209,6 +347,10 @@ export default {
         .where('id', brokerAdmin.id);
 
       if (!createdByRows.length) {
+        strapi.log.warn(
+          `[broker-admin] Usuário administrativo ${brokerAdmin.id} não encontrado na tabela admin_users.`
+        );
+
         ctx.body = { data: [] };
         return;
       }
@@ -226,7 +368,15 @@ export default {
         ),
       ];
 
+      strapi.log.info(
+        `[broker-admin][diagnostico] DocumentIds associados ao autor ${brokerAdmin.id}: ${announcementDocumentIds.length}`
+      );
+
       if (!announcementDocumentIds.length) {
+        strapi.log.warn(
+          `[broker-admin] Nenhum anúncio encontrado com created_by_id=${brokerAdmin.id}.`
+        );
+
         ctx.body = { data: [] };
         return;
       }
