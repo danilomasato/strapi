@@ -26,6 +26,7 @@ export default {
 
         'Auth.form.welcome.title': 'Painel ADM TSA Imóveis',
         'Auth.form.welcome.subtitle': 'Acesso para Corretores',
+
         'HomePage.header.title': 'Página inicial',
         'HomePage.header.subtitle': 'Bem-vindo ao seu painel de administração.',
 
@@ -46,6 +47,7 @@ export default {
 
         'content-manager.actions.create.label': 'Criar Novo Anúncio',
         'content-manager.containers.ListView.addNewEntry': 'Criar Novo Anúncio',
+
         'content-manager.pages.ListView.header-subtitle':
           '{number, plural, =0 {Nenhum Imóvel} one {# Imóvel encontrado} other {# Imóveis encontrados}}',
 
@@ -117,8 +119,14 @@ export default {
         'content-manager.components.Header.actions.details': 'Mais detalhes',
 
         'app.components.HomePage.lastEditedEntries': 'Atividade Recente',
+        'app.components.HomePage.lastPublishedEntries': 'Últimos Anúncios Publicados',
+
         'HomePage.last-edited-entries': 'Atividade Recente',
+        'HomePage.last-published-entries': 'Últimos Anúncios Publicados',
+
         'content-manager.containers.HomePage.last-edited-entries': 'Atividade Recente',
+        'content-manager.containers.HomePage.last-published-entries':
+          'Últimos Anúncios Publicados',
       },
     },
   },
@@ -137,14 +145,18 @@ export default {
 
     document.head.appendChild(style);
 
-    const traduzirAbasStatus = () => {
+    const traduzirInterface = () => {
       const traducoes: Record<string, string> = {
         draft: 'Rascunho',
         published: 'Publicado',
+        'Last edited entries': 'Atividade Recente',
+        'Last published entries': 'Últimos Anúncios Publicados',
       };
 
       document
-        .querySelectorAll('[role="tablist"][aria-label="Document status"] [role="tab"] span')
+        .querySelectorAll(
+          '[role="tablist"][aria-label="Document status"] [role="tab"] span'
+        )
         .forEach((elemento) => {
           const texto = elemento.textContent?.trim();
 
@@ -152,12 +164,22 @@ export default {
             elemento.textContent = traducoes[texto];
           }
         });
+
+      document.querySelectorAll('body *').forEach((elemento) => {
+        if (elemento.children.length === 0) {
+          const texto = elemento.textContent?.trim();
+
+          if (texto && traducoes[texto]) {
+            elemento.textContent = traducoes[texto];
+          }
+        }
+      });
     };
 
-    traduzirAbasStatus();
+    traduzirInterface();
 
     const observer = new MutationObserver(() => {
-      traduzirAbasStatus();
+      traduzirInterface();
     });
 
     observer.observe(document.body, {
