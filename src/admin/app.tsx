@@ -65,6 +65,11 @@ export default {
         'components.Select.draft-info-title': 'Rascunho',
         'components.Select.publish-info-title': 'Publicado',
 
+        'content-manager.containers.List.draft': 'Rascunho',
+        'content-manager.containers.List.published': 'Publicado',
+        'content-manager.relation.publicationState.draft': 'Rascunho',
+        'content-manager.relation.publicationState.published': 'Publicado',
+
         'content-manager.actions.discard.label': 'Descartar alterações',
         'content-manager.actions.discard.title': 'Limpar alterações não salvas',
         'content-manager.components.Header.actions.discard': 'Cancelar mudanças',
@@ -119,6 +124,19 @@ export default {
   },
 
   bootstrap(app: StrapiApp) {
+    const style = document.createElement('style');
+
+    style.textContent = `
+      div:has(> div > input[name="codigo"]),
+      div:has(> div > input[name="sortOrder"]),
+      div:has(> div > input[name="nome_exibicao"]),
+      div:has(> div > input[name="media_folder_id"]) {
+        display: none !important;
+      }
+    `;
+
+    document.head.appendChild(style);
+
     console.log('Admin TSA Imóveis inicializado');
   },
 };
