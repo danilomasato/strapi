@@ -68,7 +68,45 @@ export default {
           orderBy: { id: 'desc' },
         });
 
-      ctx.body = { data: brokers };
+      const uniqueBrokersMap = new Map();
+
+      for (const broker of brokers) {
+        const uniqueKey = broker.documentId || `id:${broker.id}`;
+
+        if (!uniqueBrokersMap.has(uniqueKey)) {
+          uniqueBrokersMap.set(uniqueKey, broker);
+        }
+      }
+
+      const uniqueBrokers = Array.from(uniqueBrokersMap.values());
+
+      strapi.log.info(
+        `[broker-admin] Registros encontrados: ${brokers.length}`
+      );
+
+      strapi.log.info(
+        `[broker-admin] Corretores únicos retornados: ${uniqueBrokers.length}`
+      );
+
+      if (brokers.length !== uniqueBrokers.length) {
+        strapi.log.warn(
+          `[broker-admin] ${brokers.length - uniqueBrokers.length} registro(s) repetido(s) removido(s) da resposta por documentId.`
+        );
+      }
+
+      strapi.log.info(
+        `[broker-admin] IDs dos corretores retornados: ${uniqueBrokers
+          .map((broker) => broker.id)
+          .join(', ')}`
+      );
+
+      strapi.log.info(
+        `[broker-admin] documentIds retornados: ${uniqueBrokers
+          .map((broker) => broker.documentId)
+          .join(', ')}`
+      );
+
+      ctx.body = { data: uniqueBrokers };
     } catch (error) {
       strapi.log.error(
         '[broker-admin] Erro ao consultar corretores:',
