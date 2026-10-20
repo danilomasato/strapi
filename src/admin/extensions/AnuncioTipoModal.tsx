@@ -4,7 +4,7 @@ import {
   useFetchClient,
 } from '@strapi/strapi/admin';
 
-type TipoAnuncio = 'venda' | 'aluguel' | 'lancamentos';
+type TipoAnuncio = 'venda' | 'aluguel' | 'Lançamentos';
 
 export const AnuncioTipoModal = () => {
   const { slug, id, form } = useContentManagerContext();
@@ -23,7 +23,6 @@ export const AnuncioTipoModal = () => {
     const verificarUsuario = async () => {
       try {
         const resposta = await get('/admin/users/me');
-
         const usuario = resposta.data?.data ?? resposta.data;
 
         if (ativo) {
@@ -61,8 +60,7 @@ export const AnuncioTipoModal = () => {
   const confirmarSelecao = () => {
     if (!tipoSelecionado) return;
 
-    // Impede a seleção de Lançamentos por outros usuários.
-    if (tipoSelecionado === 'lancamentos' && !ehVania) {
+    if (tipoSelecionado === 'Lançamentos' && !ehVania) {
       return;
     }
 
@@ -90,7 +88,7 @@ export const AnuncioTipoModal = () => {
     ...(ehVania
       ? [
           {
-            value: 'lancamentos' as const,
+            value: 'Lançamentos' as const,
             label: 'Lançamentos',
             description:
               'Imóveis de empreendimentos em lançamento.',
