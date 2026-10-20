@@ -1,17 +1,54 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   unstable_useContentManagerContext as useContentManagerContext,
+  useFetchClient,
 } from '@strapi/strapi/admin';
 
-type TipoAnuncio = 'venda' | 'aluguel';
+type TipoAnuncio = 'venda' | 'aluguel' | 'lancamentos';
 
 export const AnuncioTipoModal = () => {
   const { slug, id, form } = useContentManagerContext();
+  const { get } = useFetchClient();
+
+  const [ehVania, setEhVania] = useState(false);
 
   const [tipoSelecionado, setTipoSelecionado] =
     useState<TipoAnuncio | ''>('');
 
   const [confirmado, setConfirmado] = useState(false);
+
+  useEffect(() => {
+    let ativo = true;
+
+    const verificarUsuario = async () => {
+      try {
+        const resposta = await get('/admin/users/me');
+
+        const usuario = resposta.data?.data ?? resposta.data;
+
+        if (ativo) {
+          setEhVania(
+            usuario?.username === 'vaniaAlbuquerque'
+          );
+        }
+      } catch (error) {
+        if (ativo) {
+          setEhVania(false);
+        }
+
+        console.error(
+          'Não foi possível identificar o usuário autenticado.',
+          error
+        );
+      }
+    };
+
+    verificarUsuario();
+
+    return () => {
+      ativo = false;
+    };
+  }, [get]);
 
   if (
     slug !== 'api::anuncio.anuncio' ||
@@ -24,6 +61,11 @@ export const AnuncioTipoModal = () => {
   const confirmarSelecao = () => {
     if (!tipoSelecionado) return;
 
+    // Impede a seleção de Lançamentos por outros usuários.
+    if (tipoSelecionado === 'lancamentos' && !ehVania) {
+      return;
+    }
+
     form.onChange({
       target: {
         name: 'Tipo_de_Anuncio',
@@ -33,6 +75,29 @@ export const AnuncioTipoModal = () => {
 
     setConfirmado(true);
   };
+
+  const opcoes = [
+    {
+      value: 'venda' as const,
+      label: 'Venda',
+      description: 'Imóvel disponível para compra.',
+    },
+    {
+      value: 'aluguel' as const,
+      label: 'Aluguel',
+      description: 'Imóvel disponível para locação.',
+    },
+    ...(ehVania
+      ? [
+          {
+            value: 'lancamentos' as const,
+            label: 'Lançamentos',
+            description:
+              'Imóveis de empreendimentos em lançamento.',
+          },
+        ]
+      : []),
+  ];
 
   return (
     <div
@@ -72,18 +137,7 @@ export const AnuncioTipoModal = () => {
           Escolha o tipo de anúncio que deseja cadastrar.
         </p>
 
-        {([
-          {
-            value: 'venda',
-            label: 'Venda',
-            description: 'Imóvel disponível para compra.',
-          },
-          {
-            value: 'aluguel',
-            label: 'Aluguel',
-            description: 'Imóvel disponível para locação.',
-          },
-        ] as const).map((opcao) => (
+        {opcoes.map((opcao) => (
           <label
             key={opcao.value}
             style={{
@@ -92,13 +146,15 @@ export const AnuncioTipoModal = () => {
               gap: 12,
               padding: 16,
               marginBottom: 12,
-              border: tipoSelecionado === opcao.value
-                ? '2px solid #4945ff'
-                : '1px solid #dcdce4',
+              border:
+                tipoSelecionado === opcao.value
+                  ? '2px solid #4945ff'
+                  : '1px solid #dcdce4',
               borderRadius: 8,
-              background: tipoSelecionado === opcao.value
-                ? '#f6f5ff'
-                : '#ffffff',
+              background:
+                tipoSelecionado === opcao.value
+                  ? '#f6f5ff'
+                  : '#ffffff',
               cursor: 'pointer',
             }}
           >
@@ -113,6 +169,7 @@ export const AnuncioTipoModal = () => {
 
             <span>
               <strong>{opcao.label}</strong>
+
               <span
                 style={{
                   display: 'block',
@@ -136,10 +193,14 @@ export const AnuncioTipoModal = () => {
             padding: 13,
             border: 0,
             borderRadius: 6,
-            background: tipoSelecionado ? '#4945ff' : '#dcdce4',
+            background: tipoSelecionado
+              ? '#4945ff'
+              : '#dcdce4',
             color: '#ffffff',
             fontWeight: 600,
-            cursor: tipoSelecionado ? 'pointer' : 'not-allowed',
+            cursor: tipoSelecionado
+              ? 'pointer'
+              : 'not-allowed',
           }}
         >
           Confirmar e continuar
