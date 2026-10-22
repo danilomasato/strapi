@@ -15,7 +15,7 @@ Substitua a pasta atual `src/plugins/landing-pages` pelo conteúdo desta pasta, 
 ## Observações importantes
 - A coleção `Landing Page` e o componente `landing-page.card` precisam estar instalados no projeto.
 - Os campos de mídia permitem selecionar arquivos de imagem diretamente. Para criar a pasta de mídia com o nome correto, preencha o Nome do empreendimento antes de enviar a primeira imagem.
-- O plugin utiliza os endpoints REST `/api/landing-pages`; as permissões de leitura/criação/atualização e publicação devem estar habilitadas para a conta/role correspondente.
+- A listagem, criação, edição e exclusão de landing pages são feitas por rotas administrativas autenticadas do plugin, usando a sessão do painel e o Document Service do Strapi. Não é necessário liberar as operações da coleção em Users & Permissions nem usar um token da Content API no navegador.
 - O campo `tipoTemplate` deve existir na coleção como enum com `template-1` e `template-2`.
 
 ## Integração com a API da Hostinger
@@ -33,3 +33,7 @@ HOSTINGER_WEBSITE_DOMAIN=tudosobreap.com.br
 `HOSTINGER_ACCOUNT_USERNAME` e `HOSTINGER_WEBSITE_DOMAIN` têm valores padrão correspondentes à configuração fornecida para esta integração, mas podem ser substituídos por variáveis de ambiente. Reinicie o Strapi após configurar as variáveis. A criação usa `POST /api/hosting/v1/accounts/{username}/websites/{domain}/subdomains`; a exclusão usa `DELETE /api/hosting/v1/accounts/{username}/websites/{domain}/subdomains/{subdomain}`. A Hostinger processa a remoção de forma assíncrona, então ela pode levar alguns minutos para ser concluída.
 
 **Atenção:** o campo Subdomínio deve conter apenas o prefixo (por exemplo, `apartamentos`), não o domínio completo. A API cria o prefixo na pasta homônima e usa o diretório público conforme a chamada `curl` fornecida.
+
+
+### Correção CRUD administrativo
+As rotas administrativas `GET/POST /landing-pages/records`, `PUT/DELETE /landing-pages/records/:documentId` são implementadas no controller `hostinger.js` e usam `strapi.documents("api::landing-page.landing-page")`. O painel não precisa usar a Content API pública para criar/editar registros.

@@ -70,7 +70,7 @@ const emptyPage = (): LandingPageData => ({
   cardsConteudo2: [],
 });
 
-const API = '/api/landing-pages';
+const API = '/landing-pages/records';
 
 const LandingPages = () => {
   const { get, post, put, del } = useFetchClient();
@@ -93,11 +93,11 @@ const LandingPages = () => {
     setLoading(true);
     setError('');
     try {
-      const response = await get(`${API}?status=draft&pagination[pageSize]=100&populate=*`);
+      const response = await get(API);
       const data = response.data?.data ?? [];
       setItems(data);
     } catch (e: any) {
-      setError('Não foi possível carregar a coleção. Confira se a coleção Landing Page está instalada e se o usuário tem permissão de acesso à API.');
+      setError('Não foi possível carregar a coleção. Confira se a coleção api::landing-page.landing-page está instalada e se o usuário tem acesso ao painel administrativo.');
     } finally {
       setLoading(false);
     }
@@ -203,7 +203,7 @@ const LandingPages = () => {
 
       let response;
       if (selected) {
-        response = await put(`${API}/${selected}`, { data });
+        response = await put(`${API}/${encodeURIComponent(selected)}`, { data });
       } else {
         response = await post(API, { data });
       }
@@ -321,7 +321,7 @@ const LandingPages = () => {
     setError('');
     try {
       if (subdomain) await del(`/landing-pages/hostinger/subdomains/${encodeURIComponent(subdomain)}`);
-      await del(`${API}/${id}`);
+      await del(`${API}/${encodeURIComponent(id)}`);
       toggleNotification({ type: 'success', message: 'Landing page e subdomínio excluídos.' });
       await loadItems();
     } catch (e: any) {

@@ -1,13 +1,10 @@
 'use strict';
 
-const routes = require('./routes');
-const hostingerController = require('./controllers/hostinger');
-
-module.exports = () => ({
+module.exports = {
   register() {},
   bootstrap() {},
-  routes,
   controllers: {
-    hostinger: hostingerController,
+    hostinger: require('./controllers/hostinger'),
   },
-});
+  routes: require('./routes'),
+};
