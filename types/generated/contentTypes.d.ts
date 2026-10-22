@@ -473,6 +473,7 @@ export interface ApiAnuncioAnuncio extends Struct.CollectionTypeSchema {
   collectionName: 'anuncios';
   info: {
     displayName: 'Anuncio';
+    icon: 'House';
     pluralName: 'anuncios';
     singularName: 'anuncio';
   };
@@ -844,6 +845,53 @@ export interface ApiGlobalGlobal extends Struct.SingleTypeSchema {
     publishedAt: Schema.Attribute.DateTime;
     siteDescription: Schema.Attribute.Text & Schema.Attribute.Required;
     siteName: Schema.Attribute.String & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiLandingPageLandingPage extends Struct.CollectionTypeSchema {
+  collectionName: 'landing_pages';
+  info: {
+    description: 'P\u00E1ginas de campanha independentes dos an\u00FAncios de im\u00F3veis.';
+    displayName: 'Landing Page';
+    pluralName: 'landing-pages';
+    singularName: 'landing-page';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    cardsConteudo1: Schema.Attribute.Component<'landing-page.card', true>;
+    cardsConteudo2: Schema.Attribute.Component<'landing-page.card', true>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    descricaoTopo: Schema.Attribute.Text;
+    imagemTopo: Schema.Attribute.Media<'images'>;
+    imagensGaleria: Schema.Attribute.Media<'images', true>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::landing-page.landing-page'
+    > &
+      Schema.Attribute.Private;
+    logo: Schema.Attribute.Media<'images'>;
+    nomeEmpreendimento: Schema.Attribute.String & Schema.Attribute.Required;
+    nomeInterno: Schema.Attribute.String & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    subdominio: Schema.Attribute.UID<'nomeEmpreendimento'> &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    subTituloTopo: Schema.Attribute.String;
+    telefoneContato: Schema.Attribute.String;
+    tipoTemplate: Schema.Attribute.Enumeration<['template-1', 'template-2']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'template-1'>;
+    tituloConteudo1: Schema.Attribute.String;
+    tituloConteudo2: Schema.Attribute.String;
+    tituloTopo: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1426,6 +1474,7 @@ declare module '@strapi/strapi' {
       'api::anuncio.anuncio': ApiAnuncioAnuncio;
       'api::broker.broker': ApiBrokerBroker;
       'api::global.global': ApiGlobalGlobal;
+      'api::landing-page.landing-page': ApiLandingPageLandingPage;
       'api::tipo.tipo': ApiTipoTipo;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;

@@ -24,4 +24,8 @@ export default ({env}) => ({
     enabled: true,
     resolve: './src/plugins/broker-admin',
   },
+  'landing-pages': {
+    enabled: true,
+    resolve: './src/plugins/landing-pages',
+  },
 });

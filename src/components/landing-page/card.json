@@ -1,0 +1,26 @@
+{
+  "collectionName": "components_landing_page_cards",
+  "info": {
+    "displayName": "Card da Landing Page",
+    "description": "Card independente usado nas seções Conteúdo 1 e Conteúdo 2."
+  },
+  "options": {},
+  "attributes": {
+    "titulo": {
+      "type": "string",
+      "required": true
+    },
+    "descricao": {
+      "type": "text"
+    },
+    "preco": {
+      "type": "decimal",
+      "min": 0
+    },
+    "imagem": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    }
+  }
+}

@@ -4,7 +4,8 @@
   "info": {
     "singularName": "anuncio",
     "pluralName": "anuncios",
-    "displayName": "Anuncio"
+    "displayName": "Anuncio",
+    "icon": "House"
   },
   "options": {
     "draftAndPublish": true

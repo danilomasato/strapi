@@ -1,0 +1,89 @@
+{
+  "kind": "collectionType",
+  "collectionName": "landing_pages",
+  "info": {
+    "singularName": "landing-page",
+    "pluralName": "landing-pages",
+    "displayName": "Landing Page",
+    "description": "Páginas de campanha independentes dos anúncios de imóveis."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "nomeInterno": {
+      "type": "string",
+      "required": true
+    },
+    "nomeEmpreendimento": {
+      "type": "string",
+      "required": true
+    },
+    "subdominio": {
+      "type": "uid",
+      "targetField": "nomeEmpreendimento",
+      "required": true,
+      "unique": true
+    },
+    "tipoTemplate": {
+      "type": "enumeration",
+      "enum": [
+        "template-1",
+        "template-2"
+      ],
+      "default": "template-1",
+      "required": true,
+      "description": "Define qual dos dois modelos será usado na landing page."
+    },
+    "imagemTopo": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "logo": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "tituloTopo": {
+      "type": "string"
+    },
+    "telefoneContato": {
+      "type": "string"
+    },
+    "tituloConteudo1": {
+      "type": "string"
+    },
+    "cardsConteudo1": {
+      "type": "component",
+      "repeatable": true,
+      "component": "landing-page.card"
+    },
+    "imagensGaleria": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "tituloConteudo2": {
+      "type": "string"
+    },
+    "cardsConteudo2": {
+      "type": "component",
+      "repeatable": true,
+      "component": "landing-page.card"
+    },
+    "subTituloTopo": {
+      "type": "string"
+    },
+    "descricaoTopo": {
+      "type": "text"
+    }
+  }
+}

@@ -1,5 +1,25 @@
 import type { Schema, Struct } from '@strapi/strapi';
 
+export interface LandingPageCard extends Struct.ComponentSchema {
+  collectionName: 'components_landing_page_cards';
+  info: {
+    description: 'Card independente usado nas se\u00E7\u00F5es Conte\u00FAdo 1 e Conte\u00FAdo 2.';
+    displayName: 'Card da Landing Page';
+  };
+  attributes: {
+    descricao: Schema.Attribute.Text;
+    imagem: Schema.Attribute.Media<'images'>;
+    preco: Schema.Attribute.Decimal &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      >;
+    titulo: Schema.Attribute.String & Schema.Attribute.Required;
+  };
+}
+
 export interface SharedFotos extends Struct.ComponentSchema {
   collectionName: 'components_shared_fotos';
   info: {
@@ -79,6 +99,7 @@ export interface SharedSlider extends Struct.ComponentSchema {
 declare module '@strapi/strapi' {
   export module Public {
     export interface ComponentSchemas {
+      'landing-page.card': LandingPageCard;
       'shared.fotos': SharedFotos;
       'shared.media': SharedMedia;
       'shared.quote': SharedQuote;
