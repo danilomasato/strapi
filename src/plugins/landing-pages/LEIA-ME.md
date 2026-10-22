@@ -14,6 +14,6 @@ Substitua a pasta atual `src/plugins/landing-pages` pelo conteúdo desta pasta, 
 
 ## Observações importantes
 - A coleção `Landing Page` e o componente `landing-page.card` precisam estar instalados no projeto.
-- Os campos de mídia permitem selecionar arquivos de imagem diretamente. Para criar a pasta de mídia com o nome correto, preencha Nome interno ou Nome do empreendimento antes de enviar a primeira imagem.
+- Os campos de mídia permitem selecionar arquivos de imagem diretamente. Para criar a pasta de mídia com o nome correto, preencha o Nome do empreendimento antes de enviar a primeira imagem.
 - O plugin utiliza os endpoints REST `/api/landing-pages`; as permissões de leitura/criação/atualização e publicação devem estar habilitadas para a conta/role correspondente.
 - O campo `tipoTemplate` deve existir na coleção como enum com `template-1` e `template-2`.

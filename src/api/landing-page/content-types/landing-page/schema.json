@@ -11,10 +11,6 @@
     "draftAndPublish": true
   },
   "attributes": {
-    "nomeInterno": {
-      "type": "string",
-      "required": true
-    },
     "nomeEmpreendimento": {
       "type": "string",
       "required": true

@@ -879,7 +879,6 @@ export interface ApiLandingPageLandingPage extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     logo: Schema.Attribute.Media<'images'>;
     nomeEmpreendimento: Schema.Attribute.String & Schema.Attribute.Required;
-    nomeInterno: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
     subdominio: Schema.Attribute.UID<'nomeEmpreendimento'> &
       Schema.Attribute.Required &

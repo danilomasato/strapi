@@ -37,7 +37,6 @@ type CardData = {
 type LandingPageData = {
   documentId?: string;
   id?: number;
-  nomeInterno: string;
   nomeEmpreendimento: string;
   subdominio: string;
   tipoTemplate: 'template-1' | 'template-2';
@@ -56,7 +55,6 @@ type LandingPageData = {
 
 const emptyCard = (): CardData => ({ titulo: '', descricao: '', preco: '', imagem: '' });
 const emptyPage = (): LandingPageData => ({
-  nomeInterno: '',
   nomeEmpreendimento: '',
   subdominio: '',
   tipoTemplate: 'template-1',
@@ -122,7 +120,6 @@ const LandingPages = () => {
     setForm({
       documentId: item.documentId,
       id: item.id,
-      nomeInterno: a.nomeInterno ?? '',
       nomeEmpreendimento: a.nomeEmpreendimento ?? '',
       subdominio: a.subdominio ?? '',
       tipoTemplate: a.tipoTemplate ?? 'template-1',
@@ -164,8 +161,8 @@ const LandingPages = () => {
   };
 
   const save = async (publish: boolean) => {
-    if (!form.nomeInterno.trim() || !form.nomeEmpreendimento.trim() || !form.subdominio.trim()) {
-      setError('Preencha Nome interno, Nome do empreendimento e Subdomínio antes de salvar.');
+    if (!form.nomeEmpreendimento.trim() || !form.subdominio.trim()) {
+      setError('Preencha Nome do empreendimento e Subdomínio antes de salvar.');
       return;
     }
     setSaving(true);
@@ -178,7 +175,6 @@ const LandingPages = () => {
       imagem: c.imagem === '' ? null : Number(c.imagem),
     }));
     const data: any = {
-      nomeInterno: form.nomeInterno,
       nomeEmpreendimento: form.nomeEmpreendimento,
       subdominio: form.subdominio,
       tipoTemplate: form.tipoTemplate,
@@ -219,9 +215,9 @@ const LandingPages = () => {
 
   const ensureLandingFolder = async () => {
     if (folderId) return folderId;
-    const rawFolderName = (form.nomeInterno || form.nomeEmpreendimento || '').trim();
+    const rawFolderName = form.nomeEmpreendimento.trim();
     if (!rawFolderName) {
-      throw new Error('Preencha primeiro o Nome interno ou o Nome do empreendimento para que as imagens sejam salvas na pasta correta.');
+      throw new Error('Preencha primeiro o Nome do empreendimento para que as imagens sejam salvas na pasta correta.');
     }
     const folderName = rawFolderName.replace(/[\\/:*?"<>|]/g, '-').slice(0, 100);
     const response = await get(`/upload/folders?filters[name][$eq]=${encodeURIComponent(folderName)}&pagination[pageSize]=100`);
@@ -247,7 +243,7 @@ const LandingPages = () => {
       const uploaded = Array.isArray(response.data) ? response.data[0] : response.data?.data?.[0];
       if (!uploaded?.id) throw new Error('O Strapi não retornou o arquivo enviado.');
       onChange(uploaded.id);
-      toggleNotification({ type: 'success', message: `Imagem enviada para a pasta ${form.nomeInterno || form.nomeEmpreendimento}.` });
+      toggleNotification({ type: 'success', message: `Imagem enviada para a pasta ${form.nomeEmpreendimento}.` });
     } catch (e: any) {
       setError(e?.response?.data?.error?.message || e?.message || 'Não foi possível enviar a imagem. Verifique as permissões de mídia do painel.');
     } finally { setUploading(false); }
@@ -293,7 +289,7 @@ const LandingPages = () => {
   const filteredItems = items.filter((item) => {
     const a = item.attributes ?? item;
     const q = listSearch.trim().toLowerCase();
-    return !q || [a.nomeInterno, a.nomeEmpreendimento, a.subdominio, a.tipoTemplate].some((v) => String(v ?? '').toLowerCase().includes(q));
+    return !q || [a.nomeEmpreendimento, a.subdominio, a.tipoTemplate].some((v) => String(v ?? '').toLowerCase().includes(q));
   });
 
   if (view === 'list') {
@@ -310,7 +306,7 @@ const LandingPages = () => {
             <div className="lp-empty"><div className="lp-empty-icon">▤</div><h3>{listSearch ? 'Nenhum resultado encontrado' : 'Nenhuma landing page cadastrada'}</h3><p>{listSearch ? 'Tente buscar por outro nome ou subdomínio.' : 'Crie sua primeira landing page para começar.'}</p>{!listSearch && <Button onClick={newItem}>＋ Criar landing page</Button>}</div>
           ) : (
             <div className="lp-table-wrap"><table className="lp-table"><thead><tr><th>Landing page</th><th>Subdomínio</th><th>Template</th><th>Status</th><th></th></tr></thead><tbody>
-              {filteredItems.map((item) => { const a = item.attributes ?? item; const id = item.documentId ?? String(item.id); const published = Boolean(a.publishedAt); return <tr key={id}><td><strong>{a.nomeEmpreendimento || a.nomeInterno || 'Sem nome'}</strong><small>{a.nomeInterno || '—'}</small></td><td>{a.subdominio || '—'}</td><td>{a.tipoTemplate === 'template-2' ? 'Template 2' : 'Template 1'}</td><td><span className={`lp-status ${published ? 'lp-status-published' : 'lp-status-draft'}`}>{published ? 'Publicada' : 'Rascunho'}</span></td><td className="lp-table-action"><Button variant="secondary" onClick={() => editItem(item)}>Editar</Button></td></tr>; })}
+              {filteredItems.map((item) => { const a = item.attributes ?? item; const id = item.documentId ?? String(item.id); const published = Boolean(a.publishedAt); return <tr key={id}><td><strong>{a.nomeEmpreendimento || 'Sem nome'}</strong></td><td>{a.subdominio || '—'}</td><td>{a.tipoTemplate === 'template-2' ? 'Template 2' : 'Template 1'}</td><td><span className={`lp-status ${published ? 'lp-status-published' : 'lp-status-draft'}`}>{published ? 'Publicada' : 'Rascunho'}</span></td><td className="lp-table-action"><Button variant="secondary" onClick={() => editItem(item)}>Editar</Button></td></tr>; })}
             </tbody></table></div>
           )}
           <div className="lp-list-footer">{filteredItems.length} {filteredItems.length === 1 ? 'landing page' : 'landing pages'}{listSearch ? ' encontradas' : ' cadastradas'}</div>
@@ -328,12 +324,11 @@ const LandingPages = () => {
         {error && <Box background="danger100" padding={3} hasRadius marginBottom={4}><Typography textColor="danger700">{error}</Typography></Box>}
         <Box background="neutral0" borderColor="neutral200" borderWidth="1px" hasRadius padding={6}>
           <Typography variant="alpha" marginBottom={2}>{selected ? 'Editar landing page' : 'Nova landing page'}</Typography>
-          <Typography textColor="neutral600" marginBottom={6}>Cadastre os dados da página e envie as imagens diretamente. Os arquivos serão organizados em uma pasta da Biblioteca de mídia com o nome interno da landing page.</Typography>
+          <Typography textColor="neutral600" marginBottom={6}>Cadastre os dados da página e envie as imagens diretamente. Os arquivos serão organizados em uma pasta da Biblioteca de mídia com o nome do empreendimento.</Typography>
 
           <Typography variant="delta" marginBottom={4}>1. Dados gerais</Typography>
           <Grid.Root gap={4} marginBottom={6}>
-            <Grid.Item col={6}><Field.Root><Field.Label>Nome interno *</Field.Label><TextInput value={form.nomeInterno} onChange={(e: any) => update('nomeInterno', e.target.value)} /></Field.Root></Grid.Item>
-            <Grid.Item col={6}><Field.Root><Field.Label>Nome do empreendimento *</Field.Label><TextInput value={form.nomeEmpreendimento} onChange={(e: any) => update('nomeEmpreendimento', e.target.value)} /></Field.Root></Grid.Item>
+              <Grid.Item col={6}><Field.Root><Field.Label>Nome do empreendimento *</Field.Label><TextInput value={form.nomeEmpreendimento} onChange={(e: any) => update('nomeEmpreendimento', e.target.value)} /></Field.Root></Grid.Item>
             <Grid.Item col={6}><Field.Root><Field.Label>Subdomínio *</Field.Label><TextInput value={form.subdominio} onChange={(e: any) => update('subdominio', e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-'))} placeholder="ex.: empreendimento" /></Field.Root></Grid.Item>
             <Grid.Item col={6}><Field.Root><Field.Label>Tipo de template *</Field.Label><SingleSelect value={form.tipoTemplate} onChange={(v: any) => update('tipoTemplate', v)}><SingleSelectOption value="template-1">Template 1</SingleSelectOption><SingleSelectOption value="template-2">Template 2</SingleSelectOption></SingleSelect></Field.Root></Grid.Item>
           </Grid.Root>
