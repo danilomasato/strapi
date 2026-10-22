@@ -73,7 +73,7 @@ const emptyPage = (): LandingPageData => ({
 const API = '/api/landing-pages';
 
 const LandingPages = () => {
-  const { get, post, put } = useFetchClient();
+  const { get, post, put, del } = useFetchClient();
   const toggleNotification = useNotification();
   const [items, setItems] = useState<any[]>([]);
   const [view, setView] = useState<'list' | 'form'>('list');
@@ -190,7 +190,17 @@ const LandingPages = () => {
       cardsConteudo2: cardPayload(form.cardsConteudo2),
     };
     if (publish) data.publishedAt = new Date().toISOString();
+    let createdSubdomain = false;
+    const oldSubdomain = selected ? String((items.find((entry) => (entry.documentId ?? String(entry.id)) === selected)?.attributes ?? items.find((entry) => (entry.documentId ?? String(entry.id)) === selected) ?? {}).subdominio ?? '') : '';
+    const newSubdomain = form.subdominio.trim().toLowerCase();
     try {
+      // Cria primeiro o subdomínio quando for uma nova landing page ou quando o prefixo mudar.
+      if (!oldSubdomain || oldSubdomain.toLowerCase() !== newSubdomain) {
+        const hostingerResponse = await post('/landing-pages/hostinger/subdomains', { subdomain: newSubdomain });
+        if (hostingerResponse.data?.error) throw new Error(hostingerResponse.data.error);
+        createdSubdomain = true;
+      }
+
       let response;
       if (selected) {
         response = await put(`${API}/${selected}`, { data });
@@ -198,16 +208,31 @@ const LandingPages = () => {
         response = await post(API, { data });
       }
       const item = response.data?.data;
+
+      // Só remove o prefixo anterior depois que o cadastro com o novo prefixo foi salvo.
+      if (oldSubdomain && oldSubdomain.toLowerCase() !== newSubdomain) {
+        try {
+          await del(`/landing-pages/hostinger/subdomains/${encodeURIComponent(oldSubdomain)}`);
+        } catch (cleanupError) {
+          toggleNotification({ type: 'warning', message: `Landing page salva, mas não foi possível excluir o subdomínio antigo (${oldSubdomain}) na Hostinger.` });
+        }
+      }
+
       if (item) {
         setSelected(item.documentId ?? String(item.id));
         setForm((old) => ({ ...old, documentId: item.documentId, id: item.id, publishedAt: item.publishedAt ?? (publish ? new Date().toISOString() : null) }));
       }
-      toggleNotification({ type: 'success', message: publish ? 'Landing page publicada.' : 'Rascunho salvo.' });
+      toggleNotification({ type: 'success', message: publish ? 'Landing page publicada e subdomínio configurado.' : 'Rascunho salvo e subdomínio configurado.' });
       await loadItems();
       setView('list');
     } catch (e: any) {
-      setError('Não foi possível salvar. Verifique as permissões da API e se os nomes dos campos correspondem à coleção instalada.');
-      toggleNotification({ type: 'warning', message: 'Falha ao salvar landing page.' });
+      // Evita deixar um subdomínio recém-criado sem cadastro caso o salvamento falhe.
+      if (createdSubdomain) {
+        try { await del(`/landing-pages/hostinger/subdomains/${encodeURIComponent(newSubdomain)}`); } catch { /* Mantém o erro original; a limpeza pode ser feita manualmente. */ }
+      }
+      const message = e?.response?.data?.error || e?.response?.data?.message || e?.message || 'Erro desconhecido.';
+      setError(`Não foi possível salvar a landing page: ${message}`);
+      toggleNotification({ type: 'warning', message: 'Falha ao salvar landing page ou configurar o subdomínio.' });
     } finally {
       setSaving(false);
     }
@@ -286,6 +311,28 @@ const LandingPages = () => {
     </Box>
   );
 
+  const deleteItem = async (item: any) => {
+    const a = item.attributes ?? item;
+    const id = item.documentId ?? String(item.id);
+    const subdomain = String(a.subdominio ?? '').trim();
+    const name = a.nomeEmpreendimento || subdomain || 'esta landing page';
+    if (!window.confirm(`Deseja excluir "${name}"? Essa ação também tentará excluir o subdomínio ${subdomain ? `${subdomain}.tudosobreap.com.br` : 'associado'} na Hostinger.`)) return;
+    setLoading(true);
+    setError('');
+    try {
+      if (subdomain) await del(`/landing-pages/hostinger/subdomains/${encodeURIComponent(subdomain)}`);
+      await del(`${API}/${id}`);
+      toggleNotification({ type: 'success', message: 'Landing page e subdomínio excluídos.' });
+      await loadItems();
+    } catch (e: any) {
+      const message = e?.response?.data?.error || e?.response?.data?.message || e?.message || 'Erro desconhecido.';
+      setError(`Não foi possível excluir a landing page: ${message}`);
+      toggleNotification({ type: 'warning', message: 'Falha ao excluir landing page/subdomínio.' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const filteredItems = items.filter((item) => {
     const a = item.attributes ?? item;
     const q = listSearch.trim().toLowerCase();
@@ -306,7 +353,7 @@ const LandingPages = () => {
             <div className="lp-empty"><div className="lp-empty-icon">▤</div><h3>{listSearch ? 'Nenhum resultado encontrado' : 'Nenhuma landing page cadastrada'}</h3><p>{listSearch ? 'Tente buscar por outro nome ou subdomínio.' : 'Crie sua primeira landing page para começar.'}</p>{!listSearch && <Button onClick={newItem}>＋ Criar landing page</Button>}</div>
           ) : (
             <div className="lp-table-wrap"><table className="lp-table"><thead><tr><th>Landing page</th><th>Subdomínio</th><th>Template</th><th>Status</th><th></th></tr></thead><tbody>
-              {filteredItems.map((item) => { const a = item.attributes ?? item; const id = item.documentId ?? String(item.id); const published = Boolean(a.publishedAt); return <tr key={id}><td><strong>{a.nomeEmpreendimento || 'Sem nome'}</strong></td><td>{a.subdominio || '—'}</td><td>{a.tipoTemplate === 'template-2' ? 'Template 2' : 'Template 1'}</td><td><span className={`lp-status ${published ? 'lp-status-published' : 'lp-status-draft'}`}>{published ? 'Publicada' : 'Rascunho'}</span></td><td className="lp-table-action"><Button variant="secondary" onClick={() => editItem(item)}>Editar</Button></td></tr>; })}
+              {filteredItems.map((item) => { const a = item.attributes ?? item; const id = item.documentId ?? String(item.id); const published = Boolean(a.publishedAt); return <tr key={id}><td><strong>{a.nomeEmpreendimento || 'Sem nome'}</strong></td><td>{a.subdominio || '—'}</td><td>{a.tipoTemplate === 'template-2' ? 'Template 2' : 'Template 1'}</td><td><span className={`lp-status ${published ? 'lp-status-published' : 'lp-status-draft'}`}>{published ? 'Publicada' : 'Rascunho'}</span></td><td className="lp-table-action"><Button variant="secondary" onClick={() => editItem(item)}>Editar</Button> <Button variant="danger-light" onClick={() => deleteItem(item)}>Excluir</Button></td></tr>; })}
             </tbody></table></div>
           )}
           <div className="lp-list-footer">{filteredItems.length} {filteredItems.length === 1 ? 'landing page' : 'landing pages'}{listSearch ? ' encontradas' : ' cadastradas'}</div>

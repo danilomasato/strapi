@@ -17,3 +17,19 @@ Substitua a pasta atual `src/plugins/landing-pages` pelo conteúdo desta pasta, 
 - Os campos de mídia permitem selecionar arquivos de imagem diretamente. Para criar a pasta de mídia com o nome correto, preencha o Nome do empreendimento antes de enviar a primeira imagem.
 - O plugin utiliza os endpoints REST `/api/landing-pages`; as permissões de leitura/criação/atualização e publicação devem estar habilitadas para a conta/role correspondente.
 - O campo `tipoTemplate` deve existir na coleção como enum com `template-1` e `template-2`.
+
+## Integração com a API da Hostinger
+
+O plugin cria o subdomínio ao salvar uma nova landing page, cria o novo prefixo antes de alterar um subdomínio existente e tenta remover o prefixo anterior após salvar a alteração. A ação **Excluir** na listagem tenta remover o subdomínio na Hostinger e, em seguida, o registro da coleção.
+
+Configure estas variáveis de ambiente no servidor Strapi (nunca no painel do navegador):
+
+```env
+HOSTINGER_API_TOKEN=seu_token_da_hostinger
+HOSTINGER_ACCOUNT_USERNAME=u956524612
+HOSTINGER_WEBSITE_DOMAIN=tudosobreap.com.br
+```
+
+`HOSTINGER_ACCOUNT_USERNAME` e `HOSTINGER_WEBSITE_DOMAIN` têm valores padrão correspondentes à configuração fornecida para esta integração, mas podem ser substituídos por variáveis de ambiente. Reinicie o Strapi após configurar as variáveis. A criação usa `POST /api/hosting/v1/accounts/{username}/websites/{domain}/subdomains`; a exclusão usa `DELETE /api/hosting/v1/accounts/{username}/websites/{domain}/subdomains/{subdomain}`. A Hostinger processa a remoção de forma assíncrona, então ela pode levar alguns minutos para ser concluída.
+
+**Atenção:** o campo Subdomínio deve conter apenas o prefixo (por exemplo, `apartamentos`), não o domínio completo. A API cria o prefixo na pasta homônima e usa o diretório público conforme a chamada `curl` fornecida.
