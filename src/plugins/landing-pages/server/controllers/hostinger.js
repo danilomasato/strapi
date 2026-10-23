@@ -40,7 +40,8 @@ const requestHostinger = async ({ method, subdomain, body }) => {
     try { responseBody = JSON.parse(responseText); } catch { responseBody = { message: responseText }; }
   }
   if (!response.ok) {
-    const error = new Error(responseBody?.message || `A Hostinger retornou HTTP ${response.status}.`);
+    const details = responseBody?.message || responseBody?.error || (responseBody ? JSON.stringify(responseBody) : '');
+    const error = new Error(details || `A Hostinger retornou HTTP ${response.status}.`);
     error.status = response.status >= 400 && response.status < 500 ? 400 : 502;
     throw error;
   }
@@ -54,7 +55,7 @@ module.exports = ({ strapi }) => ({
   // sem depender da autenticação da Content API (/api/landing-pages).
   async findLandingPages(ctx) {
     try {
-      const data = await strapi.documents(LANDING_PAGE_UID).findMany({
+      const query = {
         sort: { updatedAt: 'desc' },
         populate: {
           imagemTopo: true,
@@ -63,7 +64,33 @@ module.exports = ({ strapi }) => ({
           cardsConteudo1: { populate: { imagem: true } },
           cardsConteudo2: { populate: { imagem: true } },
         },
+      };
+      // No Strapi 5, findMany sem status retorna somente documentos publicados.
+      // A listagem do plugin precisa exibir também os rascunhos.
+      const [drafts, published] = await Promise.all([
+        strapi.documents(LANDING_PAGE_UID).findMany({ ...query, status: 'draft' }),
+        strapi.documents(LANDING_PAGE_UID).findMany({ ...query, status: 'published' }),
+      ]);
+      // Para editar, prioriza os campos do rascunho, pois ele pode conter
+      // alterações mais recentes que ainda não foram publicadas. O publishedAt
+      // é preservado a partir da versão publicada para manter o status correto.
+      const draftsByDocument = new Map();
+      (drafts || []).forEach((item) => {
+        const key = item.documentId || String(item.id);
+        draftsByDocument.set(key, item);
       });
+      const publishedByDocument = new Map();
+      (published || []).forEach((item) => {
+        const key = item.documentId || String(item.id);
+        publishedByDocument.set(key, item);
+      });
+      const keys = new Set([...draftsByDocument.keys(), ...publishedByDocument.keys()]);
+      const data = [...keys].map((key) => {
+        const draft = draftsByDocument.get(key);
+        const live = publishedByDocument.get(key);
+        if (draft && live) return { ...draft, publishedAt: live.publishedAt };
+        return draft || live;
+      }).sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0));
       ctx.body = { data };
     } catch (error) {
       strapi.log.error(`Falha ao listar landing pages: ${error.message}`);
@@ -73,10 +100,13 @@ module.exports = ({ strapi }) => ({
   },
 
   async createLandingPage(ctx) {
-    const data = ctx.request.body?.data;
-    if (!data || typeof data !== 'object') return ctx.badRequest('Os dados da landing page não foram informados.');
+    const requestBody = ctx.request.body || {};
+    const data = requestBody.data;
+    const status = requestBody.status === 'published' ? 'published' : 'draft';
+    if (!data || typeof data !== 'object' || Array.isArray(data)) return ctx.badRequest('Os dados da landing page não foram informados.');
     try {
       const created = await strapi.documents(LANDING_PAGE_UID).create({
+        status,
         data,
         populate: {
           imagemTopo: true,
@@ -97,21 +127,39 @@ module.exports = ({ strapi }) => ({
 
   async updateLandingPage(ctx) {
     const documentId = getDocumentId(ctx);
-    const data = ctx.request.body?.data;
+    const requestBody = ctx.request.body || {};
+    const data = requestBody.data;
+    const status = requestBody.status === 'published' ? 'published' : 'draft';
     if (!documentId) return ctx.badRequest('O identificador da landing page é obrigatório.');
-    if (!data || typeof data !== 'object') return ctx.badRequest('Os dados da landing page não foram informados.');
+    if (!data || typeof data !== 'object' || Array.isArray(data)) return ctx.badRequest('Os dados da landing page não foram informados.');
     try {
-      const updated = await strapi.documents(LANDING_PAGE_UID).update({
-        documentId,
-        data,
-        populate: {
-          imagemTopo: true,
-          logo: true,
-          imagensGaleria: true,
-          cardsConteudo1: { populate: { imagem: true } },
-          cardsConteudo2: { populate: { imagem: true } },
-        },
-      });
+      const populate = {
+        imagemTopo: true,
+        logo: true,
+        imagensGaleria: true,
+        cardsConteudo1: { populate: { imagem: true } },
+        cardsConteudo2: { populate: { imagem: true } },
+      };
+
+      // O botão Publicar envia data vazio após salvar o rascunho. Nesse caso,
+      // publicar explicitamente o documento existente é mais seguro do que
+      // chamar update({ status: 'published', data: {} }).
+      let updated;
+      if (status === 'published' && Object.keys(data).length === 0) {
+        const result = await strapi.documents(LANDING_PAGE_UID).publish({ documentId });
+        updated = Array.isArray(result) ? result[0] : result;
+      } else if (status === 'published') {
+        await strapi.documents(LANDING_PAGE_UID).update({ documentId, status: 'draft', data });
+        const result = await strapi.documents(LANDING_PAGE_UID).publish({ documentId });
+        updated = Array.isArray(result) ? result[0] : result;
+      } else {
+        updated = await strapi.documents(LANDING_PAGE_UID).update({
+          documentId,
+          status: 'draft',
+          data,
+          populate,
+        });
+      }
       ctx.body = { data: updated };
     } catch (error) {
       strapi.log.error(`Falha ao atualizar landing page ${documentId}: ${error.message}`);

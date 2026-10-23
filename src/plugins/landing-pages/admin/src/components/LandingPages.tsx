@@ -85,6 +85,8 @@ const LandingPages = () => {
   const [error, setError] = useState('');
   const [uploading, setUploading] = useState(false);
   const [folderId, setFolderId] = useState<number | null>(null);
+  const [mediaUrls, setMediaUrls] = useState<Record<number, string>>({});
+  const [successModal, setSuccessModal] = useState<{ title: string; message: string } | null>(null);
 
   const update = <K extends keyof LandingPageData>(key: K, value: LandingPageData[K]) =>
     setForm((old) => ({ ...old, [key]: value }));
@@ -104,6 +106,31 @@ const LandingPages = () => {
   };
 
   useEffect(() => { loadItems(); }, []);
+
+  // Resolve existing Strapi media IDs to URLs so the editor shows real previews.
+  useEffect(() => {
+    const ids = new Set<number>();
+    if (form.imagemTopo !== '') ids.add(Number(form.imagemTopo));
+    form.imagensGaleria.forEach((id) => { if (id) ids.add(Number(id)); });
+    [...form.cardsConteudo1, ...form.cardsConteudo2].forEach((card) => {
+      if (card.imagem !== '') ids.add(Number(card.imagem));
+    });
+    ids.forEach(async (id) => {
+      if (!id || mediaUrls[id]) return;
+      try {
+        const response = await get(`/upload/files/${id}`);
+        const media = response.data?.data ?? response.data;
+        if (media?.url) {
+          const url = /^https?:\/\//i.test(media.url)
+            ? media.url
+            : `${window.location.origin}${media.url.startsWith('/') ? '' : '/'}${media.url}`;
+          setMediaUrls((old) => ({ ...old, [id]: url }));
+        }
+      } catch {
+        // Keep the file field usable if the media preview cannot be resolved.
+      }
+    });
+  }, [form.imagemTopo, form.imagensGaleria, form.cardsConteudo1, form.cardsConteudo2, get, mediaUrls]);
 
   const normalizeCard = (card: any): CardData => ({
     id: card.id,
@@ -161,14 +188,17 @@ const LandingPages = () => {
   };
 
   const save = async (publish: boolean) => {
-    if (!form.nomeEmpreendimento.trim() || !form.subdominio.trim()) {
+    if (!String(form.nomeEmpreendimento ?? '').trim() || !String(form.subdominio ?? '').trim()) {
       setError('Preencha Nome do empreendimento e Subdomínio antes de salvar.');
       return;
     }
     setSaving(true);
     setError('');
+    const wasAlreadyPublished = Boolean(form.publishedAt);
+    // Não reenviar IDs internos dos componentes: o Strapi pode devolver IDs
+    // da versão publicada, que não pertencem ao rascunho que está sendo editado.
+    // Sem esses IDs, o Strapi recria os componentes vinculados a esta landing page.
     const cardPayload = (cards: CardData[]) => cards.map((c) => ({
-      ...(c.id ? { id: c.id } : {}),
       titulo: c.titulo,
       descricao: c.descricao,
       preco: c.preco === '' ? null : Number(c.preco),
@@ -189,50 +219,87 @@ const LandingPages = () => {
       tituloConteudo2: form.tituloConteudo2,
       cardsConteudo2: cardPayload(form.cardsConteudo2),
     };
-    if (publish) data.publishedAt = new Date().toISOString();
+    // Primeiro persiste as alterações como rascunho. Assim, uma falha na API da Hostinger
+    // não descarta as alterações feitas nos cards, imagens ou descrições.
     let createdSubdomain = false;
-    const oldSubdomain = selected ? String((items.find((entry) => (entry.documentId ?? String(entry.id)) === selected)?.attributes ?? items.find((entry) => (entry.documentId ?? String(entry.id)) === selected) ?? {}).subdominio ?? '') : '';
-    const newSubdomain = form.subdominio.trim().toLowerCase();
+    const selectedItem = selected ? items.find((entry) => (entry.documentId ?? String(entry.id)) === selected) : null;
+    const oldRecord = selectedItem?.attributes ?? selectedItem ?? {};
+    const oldSubdomain = String(oldRecord.subdominio ?? '');
+    const newSubdomain = String(form.subdominio ?? '').trim().toLowerCase();
+    let savedDocumentId = selected;
+    let savedItem: any = null;
+
     try {
-      // Cria primeiro o subdomínio quando for uma nova landing page ou quando o prefixo mudar.
-      if (!oldSubdomain || oldSubdomain.toLowerCase() !== newSubdomain) {
-        const hostingerResponse = await post('/landing-pages/hostinger/subdomains', { subdomain: newSubdomain });
-        if (hostingerResponse.data?.error) throw new Error(hostingerResponse.data.error);
-        createdSubdomain = true;
-      }
-
       let response;
+      // Enviar os dados e a intenção de publicação na mesma chamada evita a
+      // sequência salvar-rascunho/publicar-vazio, que podia deixar o documento
+      // em estado Modified no Strapi.
       if (selected) {
-        response = await put(`${API}/${encodeURIComponent(selected)}`, { data });
+        response = await put(`${API}/${encodeURIComponent(selected)}`, {
+          data,
+          status: publish ? 'published' : 'draft',
+        });
       } else {
-        response = await post(API, { data });
+        response = await post(API, {
+          data,
+          status: publish ? 'published' : 'draft',
+        });
       }
-      const item = response.data?.data;
+      savedItem = response.data?.data;
+      savedDocumentId = savedItem?.documentId ?? (savedItem?.id != null ? String(savedItem.id) : selected);
+      if (!savedDocumentId) throw new Error('O Strapi não retornou o identificador da landing page salva.');
 
-      // Só remove o prefixo anterior depois que o cadastro com o novo prefixo foi salvo.
+      if (publish) {
+        // O conteúdo já foi publicado pelo endpoint administrativo. Agora
+        // configura o subdomínio, sem executar uma segunda publicação vazia.
+        try {
+          const hostingerResponse = await post('/landing-pages/hostinger/subdomains', {
+            subdomain: newSubdomain,
+            directory: newSubdomain,
+            is_using_public_directory: true,
+          });
+          if (hostingerResponse.data?.error) throw new Error(hostingerResponse.data.error);
+          createdSubdomain = true;
+        } catch (hostingerError: any) {
+          const hostingerMessage = String(hostingerError?.response?.data?.error || hostingerError?.response?.data?.message || hostingerError?.message || '');
+          // Um subdomínio que já existe pode ser reutilizado.
+          if (!/subdomain.*already hosted|already hosted.*subdomain/i.test(hostingerMessage)) {
+            throw new Error(`A landing page foi publicada, mas a configuração do subdomínio falhou: ${hostingerMessage}`);
+          }
+        }
+      }
+
       if (oldSubdomain && oldSubdomain.toLowerCase() !== newSubdomain) {
         try {
           await del(`/landing-pages/hostinger/subdomains/${encodeURIComponent(oldSubdomain)}`);
-        } catch (cleanupError) {
+        } catch {
           toggleNotification({ type: 'warning', message: `Landing page salva, mas não foi possível excluir o subdomínio antigo (${oldSubdomain}) na Hostinger.` });
         }
       }
 
-      if (item) {
-        setSelected(item.documentId ?? String(item.id));
-        setForm((old) => ({ ...old, documentId: item.documentId, id: item.id, publishedAt: item.publishedAt ?? (publish ? new Date().toISOString() : null) }));
+      if (savedItem) {
+        setSelected(savedItem.documentId ?? String(savedItem.id));
+        setForm((old) => ({ ...old, documentId: savedItem.documentId, id: savedItem.id, publishedAt: savedItem.publishedAt ?? (publish ? new Date().toISOString() : null) }));
       }
-      toggleNotification({ type: 'success', message: publish ? 'Landing page publicada e subdomínio configurado.' : 'Rascunho salvo e subdomínio configurado.' });
+      const successMessage = publish
+        ? wasAlreadyPublished
+          ? { title: 'Editado e republicado com sucesso!', message: 'Todas as alterações, incluindo os cards e as imagens, foram salvas e publicadas novamente.' }
+          : { title: 'Publicado com sucesso!', message: 'As alterações foram salvas na coleção e a landing page foi publicada.' }
+        : { title: 'Salvo com sucesso!', message: 'O rascunho foi salvo na coleção. O subdomínio será configurado somente quando você publicar.' };
       await loadItems();
       setView('list');
+      setSuccessModal(successMessage);
+      toggleNotification({ type: 'success', message: successMessage.title });
     } catch (e: any) {
-      // Evita deixar um subdomínio recém-criado sem cadastro caso o salvamento falhe.
+      // Se o subdomínio foi criado agora, tenta removê-lo caso a publicação falhe.
       if (createdSubdomain) {
-        try { await del(`/landing-pages/hostinger/subdomains/${encodeURIComponent(newSubdomain)}`); } catch { /* Mantém o erro original; a limpeza pode ser feita manualmente. */ }
+        try { await del(`/landing-pages/hostinger/subdomains/${encodeURIComponent(newSubdomain)}`); } catch { /* Mantém o erro original. */ }
       }
       const message = e?.response?.data?.error || e?.response?.data?.message || e?.message || 'Erro desconhecido.';
-      setError(`Não foi possível salvar a landing page: ${message}`);
-      toggleNotification({ type: 'warning', message: 'Falha ao salvar landing page ou configurar o subdomínio.' });
+      setError(`Não foi possível concluir a publicação: ${message}`);
+      // Atualiza a listagem para refletir o rascunho persistido, caso a falha tenha ocorrido após salvar.
+      await loadItems();
+      toggleNotification({ type: 'warning', message: 'A publicação não foi concluída. Confira a mensagem; as alterações podem ter sido salvas como rascunho.' });
     } finally {
       setSaving(false);
     }
@@ -240,7 +307,7 @@ const LandingPages = () => {
 
   const ensureLandingFolder = async () => {
     if (folderId) return folderId;
-    const rawFolderName = form.nomeEmpreendimento.trim();
+    const rawFolderName = String(form.nomeEmpreendimento ?? '').trim();
     if (!rawFolderName) {
       throw new Error('Preencha primeiro o Nome do empreendimento para que as imagens sejam salvas na pasta correta.');
     }
@@ -267,6 +334,10 @@ const LandingPages = () => {
       const response = await post('/upload', body);
       const uploaded = Array.isArray(response.data) ? response.data[0] : response.data?.data?.[0];
       if (!uploaded?.id) throw new Error('O Strapi não retornou o arquivo enviado.');
+      if (uploaded.url) {
+        const url = /^https?:\/\//i.test(uploaded.url) ? uploaded.url : `${window.location.origin}${uploaded.url.startsWith('/') ? '' : '/'}${uploaded.url}`;
+        setMediaUrls((old) => ({ ...old, [uploaded.id]: url }));
+      }
       onChange(uploaded.id);
       toggleNotification({ type: 'success', message: `Imagem enviada para a pasta ${form.nomeEmpreendimento}.` });
     } catch (e: any) {
@@ -277,8 +348,9 @@ const LandingPages = () => {
   const mediaField = (label: string, value: MediaValue, onChange: (value: MediaValue) => void, hint: string) => (
     <Field.Root>
       <Field.Label>{label}</Field.Label>
-      <input className="lp-input" type="file" accept="image/*" disabled={uploading} onChange={(e: any) => { const file = e.target.files?.[0]; if (file) uploadImage(file, onChange); e.target.value = ''; }} />
-      {value !== '' && <Field.Hint>Imagem enviada (ID interno {value}). Selecione outro arquivo para substituir.</Field.Hint>}
+      <input className="lp-input" type="file" accept="image/*" disabled={uploading || !(String((form as any).nomeInterno ?? '').trim() || String(form.nomeEmpreendimento ?? '').trim())} onChange={(e: any) => { const file = e.target.files?.[0]; if (file) uploadImage(file, onChange); e.target.value = ''; }} />
+      {value !== '' && mediaUrls[Number(value)] && <div className="lp-media-preview"><img src={mediaUrls[Number(value)]} alt={label} /><span>Imagem atual</span></div>}
+      {value !== '' && <Field.Hint>{mediaUrls[Number(value)] ? `Arquivo associado (ID ${value}). Selecione outro arquivo para substituir.` : `Arquivo associado (ID ${value}); carregando prévia…`}</Field.Hint>}
       <Field.Hint>{hint}</Field.Hint>
     </Field.Root>
   );
@@ -320,14 +392,38 @@ const LandingPages = () => {
     setLoading(true);
     setError('');
     try {
-      if (subdomain) await del(`/landing-pages/hostinger/subdomains/${encodeURIComponent(subdomain)}`);
+      // Exclua primeiro o documento do Strapi. Uma falha na Hostinger não deve
+      // impedir a remoção da landing page da coleção e da listagem.
       await del(`${API}/${encodeURIComponent(id)}`);
-      toggleNotification({ type: 'success', message: 'Landing page e subdomínio excluídos.' });
+      setItems((current) => current.filter((entry) => {
+        const entryId = entry.documentId ?? String(entry.id);
+        return String(entryId) !== String(id);
+      }));
+
+      let hostingerWarning = '';
+      if (subdomain) {
+        try {
+          await del(`/landing-pages/hostinger/subdomains/${encodeURIComponent(subdomain)}`);
+        } catch (hostingerError: any) {
+          const status = hostingerError?.response?.status;
+          const message = hostingerError?.response?.data?.error || hostingerError?.response?.data?.message || hostingerError?.message || '';
+          // O registro já foi excluído. Informe separadamente se a limpeza do
+          // subdomínio falhou, sem restaurar nem manter a landing page na lista.
+          hostingerWarning = status === 404
+            ? ' A landing page foi excluída, mas o subdomínio não foi encontrado na Hostinger.'
+            : ` A landing page foi excluída, mas não foi possível remover o subdomínio na Hostinger${message ? `: ${message}` : '.'}`;
+        }
+      }
+
+      toggleNotification({
+        type: hostingerWarning ? 'warning' : 'success',
+        message: hostingerWarning ? `Landing page excluída.${hostingerWarning}` : 'Landing page excluída com sucesso.',
+      });
       await loadItems();
     } catch (e: any) {
       const message = e?.response?.data?.error || e?.response?.data?.message || e?.message || 'Erro desconhecido.';
       setError(`Não foi possível excluir a landing page: ${message}`);
-      toggleNotification({ type: 'warning', message: 'Falha ao excluir landing page/subdomínio.' });
+      toggleNotification({ type: 'warning', message: `Falha ao excluir a landing page: ${message}` });
     } finally {
       setLoading(false);
     }
@@ -342,6 +438,16 @@ const LandingPages = () => {
   if (view === 'list') {
     return (
       <Main>
+        {successModal && (
+          <div className="lp-modal-backdrop" role="presentation">
+            <div className="lp-success-modal" role="dialog" aria-modal="true" aria-labelledby="lp-success-title">
+              <div className="lp-success-icon" aria-hidden="true">✓</div>
+              <h2 id="lp-success-title">{successModal.title}</h2>
+              <p>{successModal.message}</p>
+              <button className="lp-button lp-primary" onClick={() => setSuccessModal(null)}>Entendi</button>
+            </div>
+          </div>
+        )}
         <HeaderLayout title="Landing Pages" subtitle="Consulte, edite e cadastre suas páginas de campanha." primaryAction={<Button onClick={newItem}>＋ Nova landing page</Button>} />
         <Box>
           {error && <Box><Typography>{error}</Typography></Box>}
@@ -376,7 +482,7 @@ const LandingPages = () => {
           <Typography variant="delta" marginBottom={4}>1. Dados gerais</Typography>
           <Grid.Root gap={4} marginBottom={6}>
               <Grid.Item col={6}><Field.Root><Field.Label>Nome do empreendimento *</Field.Label><TextInput value={form.nomeEmpreendimento} onChange={(e: any) => update('nomeEmpreendimento', e.target.value)} /></Field.Root></Grid.Item>
-            <Grid.Item col={6}><Field.Root><Field.Label>Subdomínio *</Field.Label><TextInput value={form.subdominio} onChange={(e: any) => update('subdominio', e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-'))} placeholder="ex.: empreendimento" /></Field.Root></Grid.Item>
+            <Grid.Item col={6}><Field.Root><Field.Label>Subdomínio *</Field.Label><TextInput value={form.subdominio} onChange={(e: any) => update('subdominio', e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))} placeholder="ex.: empreendimento" /></Field.Root></Grid.Item>
             <Grid.Item col={6}><Field.Root><Field.Label>Tipo de template *</Field.Label><SingleSelect value={form.tipoTemplate} onChange={(v: any) => update('tipoTemplate', v)}><SingleSelectOption value="template-1">Template 1</SingleSelectOption><SingleSelectOption value="template-2">Template 2</SingleSelectOption></SingleSelect></Field.Root></Grid.Item>
           </Grid.Root>
 
