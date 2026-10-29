@@ -291,10 +291,8 @@ const LandingPages = () => {
       setSuccessModal(successMessage);
       toggleNotification({ type: 'success', message: successMessage.title });
     } catch (e: any) {
-      // Se o subdomínio foi criado agora, tenta removê-lo caso a publicação falhe.
-      if (createdSubdomain) {
-        try { await del(`/landing-pages/hostinger/subdomains/${encodeURIComponent(newSubdomain)}`); } catch { /* Mantém o erro original. */ }
-      }
+      // Não excluir o subdomínio recém-criado por causa de uma falha posterior
+      // na interface/listagem. A landing page já pode estar publicada no Strapi.
       const message = e?.response?.data?.error || e?.response?.data?.message || e?.message || 'Erro desconhecido.';
       setError(`Não foi possível concluir a publicação: ${message}`);
       // Atualiza a listagem para refletir o rascunho persistido, caso a falha tenha ocorrido após salvar.
