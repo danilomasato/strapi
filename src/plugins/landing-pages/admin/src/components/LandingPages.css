@@ -18,3 +18,5 @@
 
 /* Modal de confirmação após salvar/publicar */
 .lp-modal-backdrop{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(20,20,43,.48)}.lp-success-modal{box-sizing:border-box;width:100%;max-width:420px;padding:32px 30px 28px;border-radius:14px;background:#fff;text-align:center;box-shadow:0 22px 70px rgba(20,20,43,.24);animation:lp-modal-in .18s ease-out}.lp-success-icon{display:flex;align-items:center;justify-content:center;width:64px;height:64px;margin:0 auto 18px;border-radius:50%;background:#e6f7ed;color:#16834a;font-size:34px;font-weight:700}.lp-success-modal h2{margin:0 0 10px;color:#32324d;font-size:22px}.lp-success-modal p{margin:0 0 24px;color:#666687;font-size:14px;line-height:1.6}.lp-success-modal .lp-button{min-width:120px}@keyframes lp-modal-in{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+.lp-eye-icon{width:16px;height:16px;display:inline-block;vertical-align:-3px;margin-right:7px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}

@@ -433,6 +433,17 @@ const LandingPages = () => {
     return !q || [a.nomeEmpreendimento, a.subdominio, a.tipoTemplate].some((v) => String(v ?? '').toLowerCase().includes(q));
   });
 
+  const visualizeItem = (item: any) => {
+    const a = item.attributes ?? item;
+    const subdomain = String(a.subdominio ?? '').trim().toLowerCase();
+    if (!subdomain) {
+      toggleNotification({ type: 'warning', message: 'Esta landing page ainda não possui subdomínio configurado.' });
+      return;
+    }
+    const url = `https://${subdomain}.tudosobreap.com.br/`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
   if (view === 'list') {
     return (
       <Main>
@@ -457,7 +468,7 @@ const LandingPages = () => {
             <div className="lp-empty"><div className="lp-empty-icon">▤</div><h3>{listSearch ? 'Nenhum resultado encontrado' : 'Nenhuma landing page cadastrada'}</h3><p>{listSearch ? 'Tente buscar por outro nome ou subdomínio.' : 'Crie sua primeira landing page para começar.'}</p>{!listSearch && <Button onClick={newItem}>＋ Criar landing page</Button>}</div>
           ) : (
             <div className="lp-table-wrap"><table className="lp-table"><thead><tr><th>Landing page</th><th>Subdomínio</th><th>Template</th><th>Status</th><th></th></tr></thead><tbody>
-              {filteredItems.map((item) => { const a = item.attributes ?? item; const id = item.documentId ?? String(item.id); const published = Boolean(a.publishedAt); return <tr key={id}><td><strong>{a.nomeEmpreendimento || 'Sem nome'}</strong></td><td>{a.subdominio || '—'}</td><td>{a.tipoTemplate === 'template-2' ? 'Template 2' : 'Template 1'}</td><td><span className={`lp-status ${published ? 'lp-status-published' : 'lp-status-draft'}`}>{published ? 'Publicada' : 'Rascunho'}</span></td><td className="lp-table-action"><Button variant="secondary" onClick={() => editItem(item)}>Editar</Button> <Button variant="danger-light" onClick={() => deleteItem(item)}>Excluir</Button></td></tr>; })}
+              {filteredItems.map((item) => { const a = item.attributes ?? item; const id = item.documentId ?? String(item.id); const published = Boolean(a.publishedAt); return <tr key={id}><td><strong>{a.nomeEmpreendimento || 'Sem nome'}</strong></td><td>{a.subdominio || '—'}</td><td>{a.tipoTemplate === 'template-2' ? 'Template 2' : 'Template 1'}</td><td><span className={`lp-status ${published ? 'lp-status-published' : 'lp-status-draft'}`}>{published ? 'Publicada' : 'Rascunho'}</span></td><td className="lp-table-action"><Button variant="secondary" onClick={() => visualizeItem(item)} disabled={!a.subdominio}><svg className="lp-eye-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>Visualizar</Button> <Button variant="secondary" onClick={() => editItem(item)}>Editar</Button> <Button variant="danger-light" onClick={() => deleteItem(item)}>Excluir</Button></td></tr>; })}
             </tbody></table></div>
           )}
           <div className="lp-list-footer">{filteredItems.length} {filteredItems.length === 1 ? 'landing page' : 'landing pages'}{listSearch ? ' encontradas' : ' cadastradas'}</div>
