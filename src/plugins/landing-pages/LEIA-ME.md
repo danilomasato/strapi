@@ -5,12 +5,20 @@ Plugin de administração para gerenciar a coleção `api::landing-page.landing-
 ## Recursos
 - Lista e edição de landing pages existentes.
 - Cadastro de dados gerais e seleção entre Template 1 e Template 2.
-- Campos do topo (Sub Título, Título, Descrição, Telefone e imagem de fundo), Conteúdo 1, Galeria e Conteúdo 2.
+- Campos do topo (Sub Título, Título, Descrição, Telefone e imagem de fundo), Conteúdo 1, Galeria e Infraestrutura e lazer.
+- Endereço do empreendimento em Dados gerais, utilizado pelo front-end para montar o mapa.
+- Campos de subtítulo, título e descrição da infraestrutura, além de dez opções booleanas para controlar os ícones exibidos no site.
 - Adição, remoção e reordenação de cards e imagens da galeria.
 - Salvamento como rascunho e publicação.
 
 ## Instalação
 Substitua a pasta atual `src/plugins/landing-pages` pelo conteúdo desta pasta, mantendo o nome `landing-pages`. Depois execute a compilação do admin e reinicie o Strapi.
+
+## Novos campos do Content-Type
+
+O ZIP atualiza o plugin administrativo. A coleção `api::landing-page.landing-page` é definida no projeto Strapi e não estava incluída no ZIP original. Por isso, o arquivo `CAMPOS-DO-CONTENT-TYPE.json` contém os atributos que precisam ser incorporados ao objeto `attributes` do arquivo `src/api/landing-page/content-types/landing-page/schema.json` do projeto Strapi. Faça essa inclusão antes de utilizar os novos campos e reinicie/recompile o Strapi. Sem esses atributos no Content-Type, o painel poderá exibir os campos, mas o Strapi não terá onde persistir seus valores.
+
+Os campos antigos `tituloConteudo2` e `cardsConteudo2` deixam de ser apresentados e enviados pelo formulário. Eles não são apagados automaticamente do banco de dados.
 
 ## Observações importantes
 - A coleção `Landing Page` e o componente `landing-page.card` precisam estar instalados no projeto.

@@ -1,0 +1,54 @@
+{
+  "endereco": {
+    "type": "text"
+  },
+  "infraestruturaSubtitulo": {
+    "type": "string"
+  },
+  "infraestruturaTitulo": {
+    "type": "string"
+  },
+  "infraestruturaDescricao": {
+    "type": "text"
+  },
+  "infraPiscina": {
+    "type": "boolean",
+    "default": false
+  },
+  "infraAcademia": {
+    "type": "boolean",
+    "default": false
+  },
+  "infraSalaoFestas": {
+    "type": "boolean",
+    "default": false
+  },
+  "infraChurrasqueira": {
+    "type": "boolean",
+    "default": false
+  },
+  "infraPlayground": {
+    "type": "boolean",
+    "default": false
+  },
+  "infraSalaoJogos": {
+    "type": "boolean",
+    "default": false
+  },
+  "infraCoworking": {
+    "type": "boolean",
+    "default": false
+  },
+  "infraPetPlace": {
+    "type": "boolean",
+    "default": false
+  },
+  "infraJardim": {
+    "type": "boolean",
+    "default": false
+  },
+  "infraPortaria24h": {
+    "type": "boolean",
+    "default": false
+  }
+}

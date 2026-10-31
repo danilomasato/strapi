@@ -44,12 +44,24 @@ type LandingPageData = {
   tituloTopo: string;
   descricaoTopo: string;
   telefoneContato: string;
+  endereco: string;
   imagemTopo: MediaValue;
   tituloConteudo1: string;
   cardsConteudo1: CardData[];
   imagensGaleria: number[];
-  tituloConteudo2: string;
-  cardsConteudo2: CardData[];
+  infraestruturaSubtitulo: string;
+  infraestruturaTitulo: string;
+  infraestruturaDescricao: string;
+  infraPiscina: boolean;
+  infraAcademia: boolean;
+  infraSalaoFestas: boolean;
+  infraChurrasqueira: boolean;
+  infraPlayground: boolean;
+  infraSalaoJogos: boolean;
+  infraCoworking: boolean;
+  infraPetPlace: boolean;
+  infraJardim: boolean;
+  infraPortaria24h: boolean;
   publishedAt?: string | null;
 };
 
@@ -62,12 +74,24 @@ const emptyPage = (): LandingPageData => ({
   tituloTopo: '',
   descricaoTopo: '',
   telefoneContato: '',
+  endereco: '',
   imagemTopo: '',
   tituloConteudo1: '',
   cardsConteudo1: [],
   imagensGaleria: [],
-  tituloConteudo2: '',
-  cardsConteudo2: [],
+  infraestruturaSubtitulo: '',
+  infraestruturaTitulo: '',
+  infraestruturaDescricao: '',
+  infraPiscina: false,
+  infraAcademia: false,
+  infraSalaoFestas: false,
+  infraChurrasqueira: false,
+  infraPlayground: false,
+  infraSalaoJogos: false,
+  infraCoworking: false,
+  infraPetPlace: false,
+  infraJardim: false,
+  infraPortaria24h: false,
 });
 
 const API = '/landing-pages/records';
@@ -112,7 +136,7 @@ const LandingPages = () => {
     const ids = new Set<number>();
     if (form.imagemTopo !== '') ids.add(Number(form.imagemTopo));
     form.imagensGaleria.forEach((id) => { if (id) ids.add(Number(id)); });
-    [...form.cardsConteudo1, ...form.cardsConteudo2].forEach((card) => {
+    form.cardsConteudo1.forEach((card) => {
       if (card.imagem !== '') ids.add(Number(card.imagem));
     });
     ids.forEach(async (id) => {
@@ -130,7 +154,7 @@ const LandingPages = () => {
         // Keep the file field usable if the media preview cannot be resolved.
       }
     });
-  }, [form.imagemTopo, form.imagensGaleria, form.cardsConteudo1, form.cardsConteudo2, get, mediaUrls]);
+  }, [form.imagemTopo, form.imagensGaleria, form.cardsConteudo1, get, mediaUrls]);
 
   const normalizeCard = (card: any): CardData => ({
     id: card.id,
@@ -154,12 +178,24 @@ const LandingPages = () => {
       tituloTopo: a.tituloTopo ?? '',
       descricaoTopo: a.descricaoTopo ?? '',
       telefoneContato: a.telefoneContato ?? '',
+      endereco: a.endereco ?? '',
       imagemTopo: mediaId(a.imagemTopo),
       tituloConteudo1: a.tituloConteudo1 ?? '',
       cardsConteudo1: (a.cardsConteudo1?.data ?? a.cardsConteudo1 ?? []).map(normalizeCard),
       imagensGaleria: (a.imagensGaleria?.data ?? a.imagensGaleria ?? []).map((m: any) => typeof m === 'number' ? m : m.id).filter(Boolean),
-      tituloConteudo2: a.tituloConteudo2 ?? '',
-      cardsConteudo2: (a.cardsConteudo2?.data ?? a.cardsConteudo2 ?? []).map(normalizeCard),
+      infraestruturaSubtitulo: a.infraestruturaSubtitulo ?? '',
+      infraestruturaTitulo: a.infraestruturaTitulo ?? '',
+      infraestruturaDescricao: a.infraestruturaDescricao ?? '',
+      infraPiscina: Boolean(a.infraPiscina),
+      infraAcademia: Boolean(a.infraAcademia),
+      infraSalaoFestas: Boolean(a.infraSalaoFestas),
+      infraChurrasqueira: Boolean(a.infraChurrasqueira),
+      infraPlayground: Boolean(a.infraPlayground),
+      infraSalaoJogos: Boolean(a.infraSalaoJogos),
+      infraCoworking: Boolean(a.infraCoworking),
+      infraPetPlace: Boolean(a.infraPetPlace),
+      infraJardim: Boolean(a.infraJardim),
+      infraPortaria24h: Boolean(a.infraPortaria24h),
       publishedAt: a.publishedAt ?? null,
     });
     setError('');
@@ -169,7 +205,7 @@ const LandingPages = () => {
 
   const newItem = () => { setSelected(''); setForm(emptyPage()); setError(''); setFolderId(null); setView('form'); };
 
-  const updateCard = (section: 'cardsConteudo1' | 'cardsConteudo2', index: number, key: keyof CardData, value: any) => {
+  const updateCard = (section: 'cardsConteudo1', index: number, key: keyof CardData, value: any) => {
     setForm((old) => {
       const cards = [...old[section]];
       cards[index] = { ...cards[index], [key]: value };
@@ -177,7 +213,7 @@ const LandingPages = () => {
     });
   };
 
-  const moveCard = (section: 'cardsConteudo1' | 'cardsConteudo2', index: number, direction: -1 | 1) => {
+  const moveCard = (section: 'cardsConteudo1', index: number, direction: -1 | 1) => {
     setForm((old) => {
       const cards = [...old[section]];
       const target = index + direction;
@@ -212,12 +248,24 @@ const LandingPages = () => {
       tituloTopo: form.tituloTopo,
       descricaoTopo: form.descricaoTopo,
       telefoneContato: form.telefoneContato,
+      endereco: form.endereco,
       imagemTopo: form.imagemTopo === '' ? null : Number(form.imagemTopo),
       tituloConteudo1: form.tituloConteudo1,
       cardsConteudo1: cardPayload(form.cardsConteudo1),
       imagensGaleria: form.imagensGaleria.map(Number),
-      tituloConteudo2: form.tituloConteudo2,
-      cardsConteudo2: cardPayload(form.cardsConteudo2),
+      infraestruturaSubtitulo: form.infraestruturaSubtitulo,
+      infraestruturaTitulo: form.infraestruturaTitulo,
+      infraestruturaDescricao: form.infraestruturaDescricao,
+      infraPiscina: form.infraPiscina,
+      infraAcademia: form.infraAcademia,
+      infraSalaoFestas: form.infraSalaoFestas,
+      infraChurrasqueira: form.infraChurrasqueira,
+      infraPlayground: form.infraPlayground,
+      infraSalaoJogos: form.infraSalaoJogos,
+      infraCoworking: form.infraCoworking,
+      infraPetPlace: form.infraPetPlace,
+      infraJardim: form.infraJardim,
+      infraPortaria24h: form.infraPortaria24h,
     };
     // Primeiro persiste as alterações como rascunho. Assim, uma falha na API da Hostinger
     // não descarta as alterações feitas nos cards, imagens ou descrições.
@@ -346,14 +394,14 @@ const LandingPages = () => {
   const mediaField = (label: string, value: MediaValue, onChange: (value: MediaValue) => void, hint: string) => (
     <Field.Root>
       <Field.Label>{label}</Field.Label>
-      <input className="lp-input" type="file" accept="image/*" disabled={uploading || !(String((form as any).nomeInterno ?? '').trim() || String(form.nomeEmpreendimento ?? '').trim())} onChange={(e: any) => { const file = e.target.files?.[0]; if (file) uploadImage(file, onChange); e.target.value = ''; }} />
+      <input className="lp-input" type="file" accept="image/*" disabled={uploading || !String(form.nomeEmpreendimento ?? '').trim()} onChange={(e: any) => { const file = e.target.files?.[0]; if (file) uploadImage(file, onChange); e.target.value = ''; }} />
       {value !== '' && mediaUrls[Number(value)] && <div className="lp-media-preview"><img src={mediaUrls[Number(value)]} alt={label} /><span>Imagem atual</span></div>}
       {value !== '' && <Field.Hint>{mediaUrls[Number(value)] ? `Arquivo associado (ID ${value}). Selecione outro arquivo para substituir.` : `Arquivo associado (ID ${value}); carregando prévia…`}</Field.Hint>}
       <Field.Hint>{hint}</Field.Hint>
     </Field.Root>
   );
 
-  const renderCards = (section: 'cardsConteudo1' | 'cardsConteudo2', title: string) => (
+  const renderCards = (section: 'cardsConteudo1', title: string) => (
     <Box background="neutral0" borderColor="neutral200" borderWidth="1px" hasRadius padding={5} marginBottom={4}>
       <Flex justifyContent="space-between" alignItems="center" marginBottom={4}>
         <Typography variant="delta">{title}</Typography>
@@ -493,6 +541,7 @@ const LandingPages = () => {
               <Grid.Item col={6}><Field.Root><Field.Label>Nome do empreendimento *</Field.Label><TextInput value={form.nomeEmpreendimento} onChange={(e: any) => update('nomeEmpreendimento', e.target.value)} /></Field.Root></Grid.Item>
             <Grid.Item col={6}><Field.Root><Field.Label>Subdomínio *</Field.Label><TextInput value={form.subdominio} onChange={(e: any) => update('subdominio', e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))} placeholder="ex.: empreendimento" /></Field.Root></Grid.Item>
             <Grid.Item col={6}><Field.Root><Field.Label>Tipo de template *</Field.Label><SingleSelect value={form.tipoTemplate} onChange={(v: any) => update('tipoTemplate', v)}><SingleSelectOption value="template-1">Template 1</SingleSelectOption><SingleSelectOption value="template-2">Template 2</SingleSelectOption></SingleSelect></Field.Root></Grid.Item>
+            <Grid.Item col={12}><Field.Root><Field.Label>Endereço</Field.Label><TextInput value={form.endereco} onChange={(e: any) => update('endereco', e.target.value)} placeholder="Rua, número, bairro, cidade - UF" /><Field.Hint>Será utilizado para localizar o empreendimento no mapa do site.</Field.Hint></Field.Root></Grid.Item>
           </Grid.Root>
 
           <Divider marginBottom={5} />
@@ -530,9 +579,34 @@ const LandingPages = () => {
           </Box>
 
           <Divider marginBottom={5} />
-          <Typography variant="delta" marginBottom={4}>5. Conteúdo 2</Typography>
-          <Box marginBottom={4}><Field.Root><Field.Label>Título da seção</Field.Label><TextInput value={form.tituloConteudo2} onChange={(e: any) => update('tituloConteudo2', e.target.value)} /></Field.Root></Box>
-          {renderCards('cardsConteudo2', 'Cards do Conteúdo 2')}
+          <Typography variant="delta" marginBottom={4}>5. Infraestrutura e lazer</Typography>
+          <Grid.Root gap={4} marginBottom={4}>
+            <Grid.Item col={6}><Field.Root><Field.Label>Subtítulo</Field.Label><TextInput value={form.infraestruturaSubtitulo} onChange={(e: any) => update('infraestruturaSubtitulo', e.target.value)} placeholder="Ex.: Infraestrutura completa" /></Field.Root></Grid.Item>
+            <Grid.Item col={6}><Field.Root><Field.Label>Título</Field.Label><TextInput value={form.infraestruturaTitulo} onChange={(e: any) => update('infraestruturaTitulo', e.target.value)} /></Field.Root></Grid.Item>
+            <Grid.Item col={12}><Field.Root><Field.Label>Descrição</Field.Label><Textarea value={form.infraestruturaDescricao} onChange={(e: any) => update('infraestruturaDescricao', e.target.value)} /></Field.Root></Grid.Item>
+          </Grid.Root>
+          <div className="lp-infra-options">
+            <p className="lp-infra-heading">Selecione os itens de infraestrutura disponíveis no empreendimento</p>
+            <div className="lp-infra-grid">
+              {([
+                ['infraPiscina', 'Piscina adulto e infantil'],
+                ['infraAcademia', 'Academia'],
+                ['infraSalaoFestas', 'Salão de festas'],
+                ['infraChurrasqueira', 'Churrasqueira'],
+                ['infraPlayground', 'Playground'],
+                ['infraSalaoJogos', 'Salão de jogos'],
+                ['infraCoworking', 'Coworking'],
+                ['infraPetPlace', 'Pet place'],
+                ['infraJardim', 'Jardim e áreas verdes'],
+                ['infraPortaria24h', 'Portaria 24 horas'],
+              ] as const).map(([key, label]) => (
+                <label className="lp-infra-checkbox" key={key}>
+                  <input type="checkbox" checked={Boolean(form[key])} onChange={(e) => update(key, e.target.checked)} />
+                  <span>{label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
 
           <Divider marginBottom={5} />
           <Flex justifyContent="flex-end" gap={3}>

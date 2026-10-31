@@ -62,7 +62,6 @@ module.exports = ({ strapi }) => ({
           logo: true,
           imagensGaleria: true,
           cardsConteudo1: { populate: { imagem: true } },
-          cardsConteudo2: { populate: { imagem: true } },
         },
       };
       // No Strapi 5, findMany sem status retorna somente documentos publicados.
@@ -113,7 +112,6 @@ module.exports = ({ strapi }) => ({
           logo: true,
           imagensGaleria: true,
           cardsConteudo1: { populate: { imagem: true } },
-          cardsConteudo2: { populate: { imagem: true } },
         },
       });
       ctx.status = 201;
@@ -138,7 +136,6 @@ module.exports = ({ strapi }) => ({
         logo: true,
         imagensGaleria: true,
         cardsConteudo1: { populate: { imagem: true } },
-        cardsConteudo2: { populate: { imagem: true } },
       };
 
       // O botão Publicar envia data vazio após salvar o rascunho. Nesse caso,

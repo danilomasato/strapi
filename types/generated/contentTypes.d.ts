@@ -869,8 +869,28 @@ export interface ApiLandingPageLandingPage extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     descricaoTopo: Schema.Attribute.Text;
+    endereco: Schema.Attribute.Text;
     imagemTopo: Schema.Attribute.Media<'images'>;
     imagensGaleria: Schema.Attribute.Media<'images', true>;
+    infraAcademia: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    infraChurrasqueira: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<false>;
+    infraCoworking: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<false>;
+    infraestruturaDescricao: Schema.Attribute.Text;
+    infraestruturaSubtitulo: Schema.Attribute.String;
+    infraestruturaTitulo: Schema.Attribute.String;
+    infraJardim: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    infraPetPlace: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    infraPiscina: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    infraPlayground: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<false>;
+    infraPortaria24h: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<false>;
+    infraSalaoFestas: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<false>;
+    infraSalaoJogos: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<false>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
