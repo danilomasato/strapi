@@ -111,6 +111,9 @@ const LandingPages = () => {
   const [folderId, setFolderId] = useState<number | null>(null);
   const [mediaUrls, setMediaUrls] = useState<Record<number, string>>({});
   const [successModal, setSuccessModal] = useState<{ title: string; message: string } | null>(null);
+  const [openActionMenu, setOpenActionMenu] = useState<string | null>(null);
+  const [expandedCardIndex, setExpandedCardIndex] = useState<number | null>(0);
+  const [activeFormTab, setActiveFormTab] = useState<'general' | 'content' | 'gallery' | 'infrastructure'>('general');
 
   const update = <K extends keyof LandingPageData>(key: K, value: LandingPageData[K]) =>
     setForm((old) => ({ ...old, [key]: value }));
@@ -168,6 +171,8 @@ const LandingPages = () => {
     const a = item.attributes ?? item;
     const mediaId = (v: any) => v?.data?.id ?? v?.id ?? (typeof v === 'number' ? v : '');
     setSelected(item.documentId ?? String(item.id));
+    const loadedCards = (a.cardsConteudo1?.data ?? a.cardsConteudo1 ?? []).map(normalizeCard);
+    setExpandedCardIndex(loadedCards.length ? 0 : null);
     setForm({
       documentId: item.documentId,
       id: item.id,
@@ -181,7 +186,7 @@ const LandingPages = () => {
       endereco: a.endereco ?? '',
       imagemTopo: mediaId(a.imagemTopo),
       tituloConteudo1: a.tituloConteudo1 ?? '',
-      cardsConteudo1: (a.cardsConteudo1?.data ?? a.cardsConteudo1 ?? []).map(normalizeCard),
+      cardsConteudo1: loadedCards,
       imagensGaleria: (a.imagensGaleria?.data ?? a.imagensGaleria ?? []).map((m: any) => typeof m === 'number' ? m : m.id).filter(Boolean),
       infraestruturaSubtitulo: a.infraestruturaSubtitulo ?? '',
       infraestruturaTitulo: a.infraestruturaTitulo ?? '',
@@ -200,10 +205,11 @@ const LandingPages = () => {
     });
     setError('');
     setFolderId(null);
+    setActiveFormTab('general');
     setView('form');
   };
 
-  const newItem = () => { setSelected(''); setForm(emptyPage()); setError(''); setFolderId(null); setView('form'); };
+  const newItem = () => { setSelected(''); setForm(emptyPage()); setExpandedCardIndex(null); setActiveFormTab('general'); setError(''); setFolderId(null); setView('form'); };
 
   const updateCard = (section: 'cardsConteudo1', index: number, key: keyof CardData, value: any) => {
     setForm((old) => {
@@ -405,27 +411,50 @@ const LandingPages = () => {
     <Box background="neutral0" borderColor="neutral200" borderWidth="1px" hasRadius padding={5} marginBottom={4}>
       <Flex justifyContent="space-between" alignItems="center" marginBottom={4}>
         <Typography variant="delta">{title}</Typography>
-        <Button startIcon={<Plus />} onClick={() => update(section, [...form[section], emptyCard()])} variant="secondary">Adicionar card</Button>
+        <Button startIcon={<Plus />} onClick={() => { const nextIndex = form[section].length; update(section, [...form[section], emptyCard()]); setExpandedCardIndex(nextIndex); }} variant="secondary">Adicionar card</Button>
       </Flex>
       {form[section].length === 0 && <Typography textColor="neutral600">Nenhum card adicionado.</Typography>}
-      {form[section].map((card, index) => (
-        <Box key={`${section}-${index}`} padding={4} background="neutral100" hasRadius marginBottom={3}>
-          <Flex justifyContent="space-between" alignItems="center" marginBottom={3}>
-            <Typography fontWeight="bold">Card {index + 1}</Typography>
-            <Flex gap={2}>
-              <Button size="S" variant="tertiary" disabled={index === 0} onClick={() => moveCard(section, index, -1)}>↑</Button>
-              <Button size="S" variant="tertiary" disabled={index === form[section].length - 1} onClick={() => moveCard(section, index, 1)}>↓</Button>
-              <Button size="S" variant="danger-light" startIcon={<Trash />} onClick={() => update(section, form[section].filter((_, i) => i !== index))}>Remover</Button>
-            </Flex>
+      {form[section].map((card, index) => {
+        const collapsible = form[section].length > 1;
+        const expanded = !collapsible || expandedCardIndex === index;
+        const cardTitle = String(card.titulo || '').trim() || `Card ${index + 1}`;
+        const cardActions = (
+          <Flex gap={2}>
+            <Button size="S" variant="tertiary" disabled={index === 0} onClick={(e: any) => { e.stopPropagation(); moveCard(section, index, -1); if (expandedCardIndex === index) setExpandedCardIndex(index - 1); else if (expandedCardIndex === index - 1) setExpandedCardIndex(index); }}>↑</Button>
+            <Button size="S" variant="tertiary" disabled={index === form[section].length - 1} onClick={(e: any) => { e.stopPropagation(); moveCard(section, index, 1); if (expandedCardIndex === index) setExpandedCardIndex(index + 1); else if (expandedCardIndex === index + 1) setExpandedCardIndex(index); }}>↓</Button>
+            <Button size="S" variant="danger-light" startIcon={<Trash />} onClick={(e: any) => { e.stopPropagation(); update(section, form[section].filter((_, i) => i !== index)); setExpandedCardIndex((current) => current === index ? (form[section].length > 1 ? Math.max(0, index - 1) : null) : current !== null && current > index ? current - 1 : current); }}>Remover</Button>
           </Flex>
-          <Grid.Root gap={4}>
-            <Grid.Item col={6}><Field.Root><Field.Label>Título</Field.Label><TextInput value={card.titulo} onChange={(e: any) => updateCard(section, index, 'titulo', e.target.value)} /></Field.Root></Grid.Item>
-            <Grid.Item col={6}>{mediaField('Imagem do card', card.imagem, (v) => updateCard(section, index, 'imagem', v), 'Envie a imagem deste card.')}</Grid.Item>
-            <Grid.Item col={8}><Field.Root><Field.Label>Descrição</Field.Label><Textarea value={card.descricao} onChange={(e: any) => updateCard(section, index, 'descricao', e.target.value)} /></Field.Root></Grid.Item>
-            <Grid.Item col={4}><Field.Root><Field.Label>Preço</Field.Label><TextInput type="number" min={0} step="0.01" value={card.preco} onChange={(e: any) => updateCard(section, index, 'preco', e.target.value)} placeholder="0,00" /></Field.Root></Grid.Item>
-          </Grid.Root>
-        </Box>
-      ))}
+        );
+        return (
+          <div className={`lp-card-accordion ${expanded ? 'is-expanded' : ''}`} key={`${section}-${card.id ?? index}`}>
+            {collapsible ? (
+              <div className="lp-card-accordion-header">
+                <button type="button" className="lp-card-accordion-trigger" aria-expanded={expanded} onClick={() => setExpandedCardIndex(expanded ? null : index)}>
+                  <span className={`lp-card-accordion-chevron ${expanded ? 'is-open' : ''}`}>⌄</span>
+                  <span className="lp-card-accordion-title">{cardTitle}</span>
+                  <span className="lp-card-accordion-number">{`Item ${index + 1}`}</span>
+                </button>
+                <div className="lp-card-accordion-actions">{cardActions}</div>
+              </div>
+            ) : (
+              <div className="lp-card-accordion-single-header">
+                <strong>{cardTitle}</strong>
+                <div className="lp-card-accordion-actions">{cardActions}</div>
+              </div>
+            )}
+            {expanded && (
+              <div className="lp-card-accordion-content">
+                <Grid.Root gap={4}>
+                  <Grid.Item col={6}><Field.Root><Field.Label>Título</Field.Label><TextInput value={card.titulo} onChange={(e: any) => updateCard(section, index, 'titulo', e.target.value)} /></Field.Root></Grid.Item>
+                  <Grid.Item col={6}>{mediaField('Imagem do card', card.imagem, (v) => updateCard(section, index, 'imagem', v), 'Envie a imagem deste card.')}</Grid.Item>
+                  <Grid.Item col={8}><Field.Root><Field.Label>Descrição</Field.Label><Textarea value={card.descricao} onChange={(e: any) => updateCard(section, index, 'descricao', e.target.value)} /></Field.Root></Grid.Item>
+                  <Grid.Item col={4}><Field.Root><Field.Label>Preço</Field.Label><TextInput type="number" min={0} step="0.01" value={card.preco} onChange={(e: any) => updateCard(section, index, 'preco', e.target.value)} placeholder="0,00" /></Field.Root></Grid.Item>
+                </Grid.Root>
+              </div>
+            )}
+          </div>
+        );
+      })}
     </Box>
   );
 
@@ -493,6 +522,20 @@ const LandingPages = () => {
   };
 
   if (view === 'list') {
+    const publishedCount = items.filter((item) => Boolean((item.attributes ?? item).publishedAt)).length;
+    const draftCount = Math.max(0, items.length - publishedCount);
+    const formatUpdatedAt = (value: any) => {
+      if (!value) return 'Data não disponível';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return 'Data não disponível';
+      return date.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).replace(',', ' às');
+    };
+    const getCoverUrl = (value: any) => {
+      const media = value?.data ?? value;
+      const url = media?.url;
+      if (!url) return '';
+      return /^https?:\/\//i.test(url) ? url : `${window.location.origin}${url.startsWith('/') ? '' : '/'}${url}`;
+    };
     return (
       <Main>
         {successModal && (
@@ -505,117 +548,131 @@ const LandingPages = () => {
             </div>
           </div>
         )}
-        <HeaderLayout title="Landing Pages" subtitle="Consulte, edite e cadastre suas páginas de campanha." primaryAction={<Button onClick={newItem}>＋ Nova landing page</Button>} />
-        <Box>
-          {error && <Box><Typography>{error}</Typography></Box>}
-          <div className="lp-list-toolbar">
-            <div><h2>Landing pages cadastradas</h2><p>Gerencie as páginas e seus conteúdos em um só lugar.</p></div>
-            <div className="lp-list-actions"><input className="lp-input lp-search" value={listSearch} onChange={(e: any) => setListSearch(e.target.value)} placeholder="Buscar por nome ou subdomínio…" /><Button variant="secondary" onClick={loadItems} disabled={loading}>{loading ? 'Atualizando…' : 'Atualizar'}</Button></div>
+        <section className="lp-dashboard">
+          <div className="lp-dashboard-topline"><div className="lp-breadcrumb"><span>Painel</span><span className="lp-breadcrumb-chevron">›</span><strong>Landing Pages</strong></div><div className="lp-admin-label"><span className="lp-admin-avatar">AD</span><span>Administrador</span><span className="lp-admin-chevron">⌄</span></div></div>
+          <div className="lp-dashboard-heading"><div><h1>Landing Pages</h1><p>Gerencie suas páginas de campanha de forma simples e eficiente.</p></div><button className="lp-new-button" onClick={newItem}><span aria-hidden="true">＋</span> Nova Landing Page</button></div>
+          <div className="lp-stats-grid">
+            <div className="lp-stat-card lp-stat-purple"><span className="lp-stat-icon" aria-hidden="true">▣</span><div><strong>{items.length}</strong><span>Landing Pages</span></div><span className="lp-stat-wave" /></div>
+            <div className="lp-stat-card lp-stat-green"><span className="lp-stat-icon" aria-hidden="true">✓</span><div><strong>{publishedCount}</strong><span>Publicadas</span></div><span className="lp-stat-wave" /></div>
+            <div className="lp-stat-card lp-stat-orange"><span className="lp-stat-icon" aria-hidden="true">◷</span><div><strong>{draftCount}</strong><span>Rascunhos</span></div><span className="lp-stat-wave" /></div>
           </div>
+          <div className="lp-search-row"><label className="lp-search-box"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg><input value={listSearch} onChange={(e: any) => setListSearch(e.target.value)} placeholder="Buscar por empreendimento..." aria-label="Buscar por empreendimento" /></label><button className="lp-refresh-button" onClick={loadItems} disabled={loading} title="Atualizar listagem" aria-label="Atualizar listagem">{loading ? 'Atualizando…' : '↻'}</button></div>
+          {error && <div className="lp-list-error">{error}</div>}
           {loading ? <div className="lp-empty">Carregando landing pages…</div> : filteredItems.length === 0 ? (
-            <div className="lp-empty"><div className="lp-empty-icon">▤</div><h3>{listSearch ? 'Nenhum resultado encontrado' : 'Nenhuma landing page cadastrada'}</h3><p>{listSearch ? 'Tente buscar por outro nome ou subdomínio.' : 'Crie sua primeira landing page para começar.'}</p>{!listSearch && <Button onClick={newItem}>＋ Criar landing page</Button>}</div>
+            <div className="lp-empty lp-dashboard-empty"><div className="lp-empty-icon">▤</div><h3>{listSearch ? 'Nenhum resultado encontrado' : 'Nenhuma landing page cadastrada'}</h3><p>{listSearch ? 'Tente buscar por outro nome ou subdomínio.' : 'Crie sua primeira landing page para começar.'}</p>{!listSearch && <Button onClick={newItem}>＋ Criar landing page</Button>}</div>
           ) : (
-            <div className="lp-table-wrap"><table className="lp-table"><thead><tr><th>Landing page</th><th>Subdomínio</th><th>Template</th><th>Status</th><th></th></tr></thead><tbody>
-              {filteredItems.map((item) => { const a = item.attributes ?? item; const id = item.documentId ?? String(item.id); const published = Boolean(a.publishedAt); return <tr key={id}><td><strong>{a.nomeEmpreendimento || 'Sem nome'}</strong></td><td>{a.subdominio || '—'}</td><td>{a.tipoTemplate === 'template-2' ? 'Template 2' : 'Template 1'}</td><td><span className={`lp-status ${published ? 'lp-status-published' : 'lp-status-draft'}`}>{published ? 'Publicada' : 'Rascunho'}</span></td><td className="lp-table-action"><Button variant="secondary" onClick={() => visualizeItem(item)} disabled={!a.subdominio}><svg className="lp-eye-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>Visualizar</Button> <Button variant="secondary" onClick={() => editItem(item)}>Editar</Button> <Button variant="danger-light" onClick={() => deleteItem(item)}>Excluir</Button></td></tr>; })}
-            </tbody></table></div>
+            <div className="lp-record-list">
+              {filteredItems.map((item) => {
+                const a = item.attributes ?? item;
+                const id = item.documentId ?? String(item.id);
+                const published = Boolean(a.publishedAt);
+                const coverUrl = getCoverUrl(a.imagemTopo);
+                return <article className="lp-record-card" key={id}>
+                  <div className="lp-record-identity"><div className="lp-record-thumb">{coverUrl ? <img src={coverUrl} alt={`Imagem de ${a.nomeEmpreendimento || 'landing page'}`} /> : <span aria-hidden="true">▧</span>}</div><div className="lp-record-name"><strong>{a.nomeEmpreendimento || 'Sem nome'}</strong><span>{a.subdominio || 'Subdomínio não definido'}</span></div></div>
+                  <div className="lp-record-status"><span className={`lp-status-pill ${published ? 'is-published' : 'is-draft'}`}><i />{published ? 'Publicado' : 'Rascunho'}</span><span className="lp-updated-label">Atualizado em:</span><time>{formatUpdatedAt(a.updatedAt)}</time></div>
+                  <div className="lp-record-actions"><button className="lp-view-button" onClick={() => visualizeItem(item)} disabled={!a.subdominio}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>Visualizar</button><button className="lp-edit-button" onClick={() => editItem(item)}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 5 5 5M4 20l4.2-.8L20 7.4 16.6 4 4.8 15.8 4 20Z"/></svg>Editar</button><div className="lp-more-wrap"><button className="lp-more-button" onClick={() => setOpenActionMenu(openActionMenu === id ? null : id)} aria-label={`Mais ações para ${a.nomeEmpreendimento || 'landing page'}`} aria-expanded={openActionMenu === id}>⋮</button>{openActionMenu === id && <><button className="lp-menu-dismiss" aria-label="Fechar menu" onClick={() => setOpenActionMenu(null)} /><div className="lp-action-menu"><button onClick={() => { setOpenActionMenu(null); deleteItem(item); }}>Excluir landing page</button></div></>}</div></div>
+                </article>;
+              })}
+            </div>
           )}
-          <div className="lp-list-footer">{filteredItems.length} {filteredItems.length === 1 ? 'landing page' : 'landing pages'}{listSearch ? ' encontradas' : ' cadastradas'}</div>
-        </Box>
+          <div className="lp-list-footer lp-dashboard-footer">{filteredItems.length} {filteredItems.length === 1 ? 'landing page' : 'landing pages'}{listSearch ? ' encontradas' : ' cadastradas'}</div>
+        </section>
       </Main>
     );
   }
 
+  const selectedAmenities = ([
+    ['infraPiscina', 'Piscina'], ['infraAcademia', 'Academia'], ['infraSalaoFestas', 'Salão de festas'],
+    ['infraChurrasqueira', 'Churrasqueira'], ['infraPlayground', 'Playground'], ['infraSalaoJogos', 'Salão de jogos'],
+    ['infraCoworking', 'Coworking'], ['infraPetPlace', 'Pet place'], ['infraJardim', 'Jardim'], ['infraPortaria24h', 'Portaria 24h'],
+  ] as const).filter(([key]) => Boolean(form[key])).map(([, label]) => label);
+  const heroPreviewUrl = form.imagemTopo !== '' ? mediaUrls[Number(form.imagemTopo)] : '';
+  const previewTitle = form.tituloTopo || 'Seu título aqui';
+  const previewSubtitle = form.subTituloTopo || 'Seu subtítulo aqui';
+  const openPreview = () => {
+    const current = items.find((item) => (item.documentId ?? String(item.id)) === selected);
+    if (current) visualizeItem(current);
+    else toggleNotification({ type: 'info', message: 'Salve e publique a landing page para visualizar o endereço definitivo.' });
+  };
+
   return (
     <Main>
-      <HeaderLayout title={selected ? 'Editar landing page' : 'Nova landing page'} subtitle="Preencha os dados e gerencie os conteúdos da página." primaryAction={<Button variant="secondary" onClick={() => { setView('list'); setError(''); }}>← Voltar para a lista</Button>} />
-      <div className="lp-form-page">
-      <Box paddingLeft={8} paddingRight={8} paddingBottom={8}>
-        {uploading && <Box><Typography>Enviando imagem para a pasta da landing page…</Typography></Box>}
-        {error && <Box background="danger100" padding={3} hasRadius marginBottom={4}><Typography textColor="danger700">{error}</Typography></Box>}
-        <Box background="neutral0" borderColor="neutral200" borderWidth="1px" hasRadius padding={6}>
-          <Typography variant="alpha" marginBottom={2}>{selected ? 'Editar landing page' : 'Nova landing page'}</Typography>
-          <Typography textColor="neutral600" marginBottom={6}>Cadastre os dados da página e envie as imagens diretamente. Os arquivos serão organizados em uma pasta da Biblioteca de mídia com o nome do empreendimento.</Typography>
-
-          <Typography variant="delta" marginBottom={4}>1. Dados gerais</Typography>
-          <Grid.Root gap={4} marginBottom={6}>
-              <Grid.Item col={6}><Field.Root><Field.Label>Nome do empreendimento *</Field.Label><TextInput value={form.nomeEmpreendimento} onChange={(e: any) => update('nomeEmpreendimento', e.target.value)} /></Field.Root></Grid.Item>
-            <Grid.Item col={6}><Field.Root><Field.Label>Subdomínio *</Field.Label><TextInput value={form.subdominio} onChange={(e: any) => update('subdominio', e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))} placeholder="ex.: empreendimento" /></Field.Root></Grid.Item>
-            <Grid.Item col={6}><Field.Root><Field.Label>Tipo de template *</Field.Label><SingleSelect value={form.tipoTemplate} onChange={(v: any) => update('tipoTemplate', v)}><SingleSelectOption value="template-1">Template 1</SingleSelectOption><SingleSelectOption value="template-2">Template 2</SingleSelectOption></SingleSelect></Field.Root></Grid.Item>
-            <Grid.Item col={12}><Field.Root><Field.Label>Endereço</Field.Label><TextInput value={form.endereco} onChange={(e: any) => update('endereco', e.target.value)} placeholder="Rua, número, bairro, cidade - UF" /><Field.Hint>Será utilizado para localizar o empreendimento no mapa do site.</Field.Hint></Field.Root></Grid.Item>
-          </Grid.Root>
-
-          <Divider marginBottom={5} />
-          <Typography variant="delta" marginBottom={4}>2. Título</Typography>
-          <Grid.Root gap={4} marginBottom={6}>
-            <Grid.Item col={6}>{mediaField('Imagem de fundo', form.imagemTopo, (v) => update('imagemTopo', v), 'Envie a imagem de fundo do banner.')}</Grid.Item>
-            <Grid.Item col={6}><Field.Root><Field.Label>Sub Título</Field.Label><TextInput value={form.subTituloTopo} onChange={(e: any) => update('subTituloTopo', e.target.value)} /></Field.Root></Grid.Item>
-            <Grid.Item col={6}><Field.Root><Field.Label>Título</Field.Label><TextInput value={form.tituloTopo} onChange={(e: any) => update('tituloTopo', e.target.value)} /></Field.Root></Grid.Item>
-            <Grid.Item col={6}><Field.Root><Field.Label>Telefone</Field.Label><TextInput value={form.telefoneContato} onChange={(e: any) => update('telefoneContato', e.target.value)} /></Field.Root></Grid.Item>
-            <Grid.Item col={12}><Field.Root><Field.Label>Descrição</Field.Label><Textarea value={form.descricaoTopo} onChange={(e: any) => update('descricaoTopo', e.target.value)} /></Field.Root></Grid.Item>
-          </Grid.Root>
-
-          <Divider marginBottom={5} />
-          <Typography variant="delta" marginBottom={4}>3. Conteúdo 1</Typography>
-          <Box marginBottom={4}><Field.Root><Field.Label>Título da seção</Field.Label><TextInput value={form.tituloConteudo1} onChange={(e: any) => update('tituloConteudo1', e.target.value)} /></Field.Root></Box>
-          {renderCards('cardsConteudo1', 'Cards do Conteúdo 1')}
-
-          <Divider marginBottom={5} />
-          <Typography variant="delta" marginBottom={4}>4. Galeria</Typography>
-          <Box background="neutral0" borderColor="neutral200" borderWidth="1px" hasRadius padding={5} marginBottom={6}>
-            <Flex justifyContent="space-between" alignItems="center" marginBottom={3}>
-              <Typography>Imagens da galeria</Typography>
-              <Button startIcon={<Plus />} variant="secondary" onClick={() => update('imagensGaleria', [...form.imagensGaleria, 0])}>Adicionar imagem</Button>
-            </Flex>
-            {form.imagensGaleria.length === 0 && <Typography textColor="neutral600">Nenhuma imagem adicionada.</Typography>}
-            {form.imagensGaleria.map((id, index) => (
-              <Flex key={`gallery-${index}`} gap={2} alignItems="end" marginBottom={3}>
-                <Box flex="1"><Field.Root><Field.Label>Imagem {index + 1}</Field.Label><input className="lp-input" type="file" accept="image/*" disabled={uploading} onChange={(e: any) => { const file = e.target.files?.[0]; if (file) uploadImage(file, (v) => update('imagensGaleria', form.imagensGaleria.map((old, i) => i === index ? Number(v) : old))); e.target.value = ''; }} />{id ? <small className="lp-hint">Imagem enviada (ID interno {id}).</small> : null}</Field.Root></Box>
-                <Button variant="tertiary" disabled={index === 0} onClick={() => { const next = [...form.imagensGaleria]; [next[index - 1], next[index]] = [next[index], next[index - 1]]; update('imagensGaleria', next); }}>↑</Button>
-                <Button variant="tertiary" disabled={index === form.imagensGaleria.length - 1} onClick={() => { const next = [...form.imagensGaleria]; [next[index + 1], next[index]] = [next[index], next[index + 1]]; update('imagensGaleria', next); }}>↓</Button>
-                <Button variant="danger-light" startIcon={<Trash />} onClick={() => update('imagensGaleria', form.imagensGaleria.filter((_, i) => i !== index))}>Remover</Button>
-              </Flex>
-            ))}
-            <Typography textColor="neutral600" variant="pi">As imagens enviadas ficam na pasta desta landing page. A ordem listada será mantida.</Typography>
-          </Box>
-
-          <Divider marginBottom={5} />
-          <Typography variant="delta" marginBottom={4}>5. Infraestrutura e lazer</Typography>
-          <Grid.Root gap={4} marginBottom={4}>
-            <Grid.Item col={6}><Field.Root><Field.Label>Subtítulo</Field.Label><TextInput value={form.infraestruturaSubtitulo} onChange={(e: any) => update('infraestruturaSubtitulo', e.target.value)} placeholder="Ex.: Infraestrutura completa" /></Field.Root></Grid.Item>
-            <Grid.Item col={6}><Field.Root><Field.Label>Título</Field.Label><TextInput value={form.infraestruturaTitulo} onChange={(e: any) => update('infraestruturaTitulo', e.target.value)} /></Field.Root></Grid.Item>
-            <Grid.Item col={12}><Field.Root><Field.Label>Descrição</Field.Label><Textarea value={form.infraestruturaDescricao} onChange={(e: any) => update('infraestruturaDescricao', e.target.value)} /></Field.Root></Grid.Item>
-          </Grid.Root>
-          <div className="lp-infra-options">
-            <p className="lp-infra-heading">Selecione os itens de infraestrutura disponíveis no empreendimento</p>
-            <div className="lp-infra-grid">
-              {([
-                ['infraPiscina', 'Piscina adulto e infantil'],
-                ['infraAcademia', 'Academia'],
-                ['infraSalaoFestas', 'Salão de festas'],
-                ['infraChurrasqueira', 'Churrasqueira'],
-                ['infraPlayground', 'Playground'],
-                ['infraSalaoJogos', 'Salão de jogos'],
-                ['infraCoworking', 'Coworking'],
-                ['infraPetPlace', 'Pet place'],
-                ['infraJardim', 'Jardim e áreas verdes'],
-                ['infraPortaria24h', 'Portaria 24 horas'],
-              ] as const).map(([key, label]) => (
-                <label className="lp-infra-checkbox" key={key}>
-                  <input type="checkbox" checked={Boolean(form[key])} onChange={(e) => update(key, e.target.checked)} />
-                  <span>{label}</span>
-                </label>
-              ))}
+      <div className="lp-create-page">
+        <div className="lp-create-topline">
+          <div className="lp-create-breadcrumb"><span>Painel</span><b>›</b><span onClick={() => { setView('list'); setError(''); }}>Landing Pages</span><b>›</b><strong>{selected ? 'Editar Landing Page' : 'Nova Landing Page'}</strong></div>
+          <div className="lp-admin-label"><span className="lp-admin-avatar">AD</span><span>Administrador</span><span className="lp-admin-chevron">⌄</span></div>
+        </div>
+        <div className="lp-create-heading">
+          <div className="lp-create-title-wrap"><button className="lp-back-circle" onClick={() => { setView('list'); setError(''); }} aria-label="Voltar">←</button><div><h1>{selected ? 'Editar Landing Page' : 'Nova Landing Page'}</h1><p>Crie uma página exclusiva para seu empreendimento</p></div></div>
+          <div className="lp-create-heading-actions"><button className="lp-create-cancel" onClick={() => { setView('list'); setError(''); }}>× <span>Cancelar</span></button><button className="lp-create-save" disabled={saving} onClick={() => save(false)}><span>▣</span> Salvar Página</button></div>
+        </div>
+        {error && <div className="lp-create-error">{error}</div>}
+        {uploading && <div className="lp-create-info">Enviando imagem para a pasta da landing page…</div>}
+        <div className="lp-create-layout">
+          <section className="lp-create-editor">
+            <nav className="lp-create-tabs" aria-label="Seções da landing page">
+              <button className={activeFormTab === 'general' ? 'is-active' : ''} onClick={() => setActiveFormTab('general')}><span>▣</span> Informações Gerais</button>
+              <button className={activeFormTab === 'content' ? 'is-active' : ''} onClick={() => setActiveFormTab('content')}><span>▧</span> Conteúdo</button>
+              <button className={activeFormTab === 'gallery' ? 'is-active' : ''} onClick={() => setActiveFormTab('gallery')}><span>▦</span> Galeria</button>
+              <button className={activeFormTab === 'infrastructure' ? 'is-active' : ''} onClick={() => setActiveFormTab('infrastructure')}><span>☆</span> Infraestrutura</button>
+            </nav>
+            <div className="lp-create-tab-content">
+              {activeFormTab === 'general' && <>
+                <div className="lp-create-section-title"><span>▦</span><h2>Identificação</h2></div>
+                <Grid.Root gap={4} marginBottom={5}>
+                  <Grid.Item col={6}><Field.Root><Field.Label>Nome do Empreendimento *</Field.Label><TextInput value={form.nomeEmpreendimento} onChange={(e: any) => update('nomeEmpreendimento', e.target.value)} placeholder="Ex: Residencial Vista Verde" /></Field.Root></Grid.Item>
+                  <Grid.Item col={6}><Field.Root><Field.Label>Subdomínio *</Field.Label><div className="lp-domain-input"><span>https://</span><TextInput value={form.subdominio} onChange={(e: any) => update('subdominio', e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))} placeholder="ex: vista-verde" /><span>.tudosobreap.com.br</span></div></Field.Root></Grid.Item>
+                  <Grid.Item col={6}><Field.Root><Field.Label>Tipo de template *</Field.Label><SingleSelect value={form.tipoTemplate} onChange={(v: any) => update('tipoTemplate', v)}><SingleSelectOption value="template-1">Template 1</SingleSelectOption><SingleSelectOption value="template-2">Template 2</SingleSelectOption></SingleSelect></Field.Root></Grid.Item>
+                  <Grid.Item col={6}><Field.Root><Field.Label>Telefone de contato</Field.Label><TextInput value={form.telefoneContato} onChange={(e: any) => update('telefoneContato', e.target.value)} placeholder="(11) 00000-0000" /></Field.Root></Grid.Item>
+                  <Grid.Item col={12}><Field.Root><Field.Label>Endereço</Field.Label><TextInput value={form.endereco} onChange={(e: any) => update('endereco', e.target.value)} placeholder="Rua, número, bairro, cidade - UF" /><Field.Hint>Será utilizado para localizar o empreendimento no mapa do site.</Field.Hint></Field.Root></Grid.Item>
+                </Grid.Root>
+                <div className="lp-create-section-title"><span>▧</span><div><h2>Imagem de Topo</h2><p>Escolha uma imagem de destaque para sua landing page.</p></div></div>
+                <div className="lp-create-upload-layout"><div className="lp-create-upload-box"><div>▱</div><strong>Selecione a imagem de destaque</strong><span>Envie uma imagem para o banner principal</span>{mediaField('Imagem de Topo', form.imagemTopo, (v) => update('imagemTopo', v), 'Formatos de imagem aceitos: JPG, PNG ou WebP.')}</div>{heroPreviewUrl ? <img className="lp-create-upload-preview" src={heroPreviewUrl} alt="Prévia da imagem de topo" /> : <div className="lp-create-upload-placeholder">A prévia da imagem aparecerá aqui</div>}</div>
+                <div className="lp-create-section-title"><span>✎</span><h2>Título e Descrição</h2></div>
+                <Grid.Root gap={4}>
+                  <Grid.Item col={6}><Field.Root><Field.Label>Título do Topo</Field.Label><TextInput value={form.tituloTopo} onChange={(e: any) => update('tituloTopo', e.target.value)} placeholder="Ex: Viva o melhor da vida" /></Field.Root></Grid.Item>
+                  <Grid.Item col={6}><Field.Root><Field.Label>Subtítulo do Topo</Field.Label><TextInput value={form.subTituloTopo} onChange={(e: any) => update('subTituloTopo', e.target.value)} placeholder="Ex: Conforto, lazer e sofisticação" /></Field.Root></Grid.Item>
+                  <Grid.Item col={12}><Field.Root><Field.Label>Descrição do Topo</Field.Label><Textarea value={form.descricaoTopo} onChange={(e: any) => update('descricaoTopo', e.target.value)} placeholder="Conte um pouco sobre seu empreendimento..." /></Field.Root></Grid.Item>
+                </Grid.Root>
+              </>}
+              {activeFormTab === 'content' && <>
+                <div className="lp-create-section-title"><span>▤</span><div><h2>Conteúdo da Página</h2><p>Organize os textos e cards que apresentam o empreendimento.</p></div></div>
+                <Field.Root><Field.Label>Título da seção</Field.Label><TextInput value={form.tituloConteudo1} onChange={(e: any) => update('tituloConteudo1', e.target.value)} placeholder="Ex: Conheça o empreendimento" /></Field.Root>
+                {renderCards('cardsConteudo1', 'Cards do Conteúdo')}
+              </>}
+              {activeFormTab === 'gallery' && <>
+                <div className="lp-create-section-title"><span>▦</span><div><h2>Galeria de Imagens</h2><p>Adicione e organize as imagens que serão exibidas na galeria.</p></div></div>
+                <div className="lp-create-gallery-toolbar"><div><strong>{form.imagensGaleria.length} {form.imagensGaleria.length === 1 ? 'imagem adicionada' : 'imagens adicionadas'}</strong><p>A ordem abaixo será mantida na página publicada.</p></div><Button startIcon={<Plus />} variant="secondary" onClick={() => update('imagensGaleria', [...form.imagensGaleria, 0])}>Adicionar imagem</Button></div>
+                {form.imagensGaleria.length === 0 && <div className="lp-create-empty"><span>▧</span><strong>Nenhuma imagem adicionada</strong><p>Comece adicionando imagens à galeria do empreendimento.</p></div>}
+                {form.imagensGaleria.map((id, index) => <div className="lp-create-gallery-item" key={`gallery-${index}`}><div className="lp-create-gallery-number">{index + 1}</div><div className="lp-create-gallery-thumb">{id && mediaUrls[Number(id)] ? <img src={mediaUrls[Number(id)]} alt={`Miniatura da imagem ${index + 1}`} /> : <span aria-label="Prévia indisponível">▧</span>}</div><div className="lp-create-gallery-field"><Field.Root><Field.Label>Imagem {index + 1}</Field.Label><input className="lp-input" type="file" accept="image/*" disabled={uploading} onChange={(e: any) => { const file = e.target.files?.[0]; if (file) uploadImage(file, (v) => update('imagensGaleria', form.imagensGaleria.map((old, i) => i === index ? Number(v) : old))); e.target.value = ''; }} />{id ? <small className="lp-hint">Imagem enviada (ID interno {id}).</small> : <small className="lp-hint">Selecione uma imagem para visualizar a miniatura.</small>}</Field.Root></div><div className="lp-create-gallery-actions"><Button variant="tertiary" disabled={index === 0} onClick={() => { const next = [...form.imagensGaleria]; [next[index - 1], next[index]] = [next[index], next[index - 1]]; update('imagensGaleria', next); }}>↑</Button><Button variant="tertiary" disabled={index === form.imagensGaleria.length - 1} onClick={() => { const next = [...form.imagensGaleria]; [next[index + 1], next[index]] = [next[index], next[index + 1]]; update('imagensGaleria', next); }}>↓</Button><Button variant="danger-light" onClick={() => update('imagensGaleria', form.imagensGaleria.filter((_, i) => i !== index))}>Remover</Button></div></div>)}
+              </>}
+              {activeFormTab === 'infrastructure' && <>
+                <div className="lp-create-section-title"><span>☆</span><div><h2>Infraestrutura e Lazer</h2><p>Informe os diferenciais disponíveis no empreendimento.</p></div></div>
+                <Grid.Root gap={4}>
+                  <Grid.Item col={6}><Field.Root><Field.Label>Subtítulo</Field.Label><TextInput value={form.infraestruturaSubtitulo} onChange={(e: any) => update('infraestruturaSubtitulo', e.target.value)} placeholder="Ex.: Infraestrutura completa" /></Field.Root></Grid.Item>
+                  <Grid.Item col={6}><Field.Root><Field.Label>Título</Field.Label><TextInput value={form.infraestruturaTitulo} onChange={(e: any) => update('infraestruturaTitulo', e.target.value)} /></Field.Root></Grid.Item>
+                  <Grid.Item col={12}><Field.Root><Field.Label>Descrição</Field.Label><Textarea value={form.infraestruturaDescricao} onChange={(e: any) => update('infraestruturaDescricao', e.target.value)} /></Field.Root></Grid.Item>
+                </Grid.Root>
+                <div className="lp-create-amenities-heading">Selecione os itens de infraestrutura disponíveis no empreendimento</div>
+                <div className="lp-infra-grid">{([
+                  ['infraPiscina', 'Piscina adulto e infantil'], ['infraAcademia', 'Academia'], ['infraSalaoFestas', 'Salão de festas'], ['infraChurrasqueira', 'Churrasqueira'], ['infraPlayground', 'Playground'], ['infraSalaoJogos', 'Salão de jogos'], ['infraCoworking', 'Coworking'], ['infraPetPlace', 'Pet place'], ['infraJardim', 'Jardim e áreas verdes'], ['infraPortaria24h', 'Portaria 24 horas'],
+                ] as const).map(([key, label]) => <label className="lp-infra-checkbox" key={key}><input type="checkbox" checked={Boolean(form[key])} onChange={(e) => update(key, e.target.checked)} /><span>{label}</span></label>)}</div>
+              </>}
             </div>
-          </div>
-
-          <Divider marginBottom={5} />
-          <Flex justifyContent="flex-end" gap={3}>
-            <Button variant="secondary" onClick={newItem}>Limpar formulário</Button>
-            <Button variant="secondary" startIcon={<Check />} loading={saving} onClick={() => save(false)}>Salvar rascunho</Button>
-            <Button loading={saving} onClick={() => save(true)}>Publicar</Button>
-          </Flex>
-        </Box>
-      </Box>
+          </section>
+          <aside className="lp-create-summary">
+            <div className="lp-create-summary-title"><span>◉</span><h2>Resumo da Página</h2></div>
+            <div className="lp-create-live-preview">
+              {heroPreviewUrl ? <img src={heroPreviewUrl} alt="Imagem do empreendimento" /> : <div className="lp-create-preview-placeholder">A imagem do empreendimento aparecerá aqui</div>}
+              <div className="lp-create-preview-overlay"><strong>{previewTitle}</strong><span>{previewSubtitle}</span></div>
+            </div>
+            <div className="lp-create-preview-amenities">{selectedAmenities.length ? selectedAmenities.slice(0, 3).map((label) => <span key={label}>✦ {label}</span>) : <span>✦ Adicione itens de infraestrutura</span>}</div>
+            <div className="lp-create-domain-summary"><span>◎</span><div><small>Subdomínio</small><strong>{form.subdominio ? `https://${form.subdominio}.tudosobreap.com.br` : 'https://seuempreendimento.tudosobreap.com.br'}</strong></div></div>
+            <div className="lp-create-publish-summary"><span className={`lp-create-status-dot ${form.publishedAt ? 'is-published' : ''}`}></span><div><strong>Status da Página</strong><small>{form.publishedAt ? 'Esta página está publicada.' : 'A página será publicada quando você selecionar Publicar.'}</small></div><span className={`lp-create-status-label ${form.publishedAt ? 'is-published' : ''}`}>{form.publishedAt ? 'Publicada' : 'Rascunho'}</span></div>
+            <div className="lp-create-summary-note">ⓘ Após salvar, você poderá continuar editando o conteúdo e publicar quando estiver tudo pronto.</div>
+          </aside>
+        </div>
+        <div className="lp-create-bottom-bar"><button className="lp-create-preview-button" onClick={openPreview}>◉ <span>Visualizar</span></button><div className="lp-create-bottom-actions"><button className="lp-create-draft-button" disabled={saving} onClick={() => save(false)}>Salvar rascunho</button><button className="lp-create-publish-button" disabled={saving} onClick={() => save(true)}>{saving ? 'Salvando…' : '▣ Salvar e Publicar'}</button></div></div>
       </div>
     </Main>
   );
