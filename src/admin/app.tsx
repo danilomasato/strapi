@@ -128,11 +128,6 @@ export default {
         list-style: none;
       }
 
-      html, body {
-        font-family: system-ui;
-        font-size: 62.5%;
-      }
-
       #main-content input[name="codigo"] {
         background-color: #e0e0e0;
         cursor: not-allowed;
