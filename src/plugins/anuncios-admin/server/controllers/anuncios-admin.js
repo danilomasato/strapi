@@ -64,4 +64,34 @@ module.exports = ({ strapi }) => ({
       ctx.throw(500, 'Não foi possível carregar os anúncios.');
     }
   },
+
+  async detail(ctx) {
+    try {
+      const documentId = ctx.params.documentId;
+      const documents = strapi.documents(UID);
+      const [published, draft] = await Promise.all([
+        documents.findOne({ documentId, status: 'published', populate: { Fotos: true } }),
+        documents.findOne({ documentId, status: 'draft', populate: { Fotos: true } }),
+      ]);
+
+      if (!published && !draft) return ctx.notFound('Anúncio não encontrado.');
+
+      // Para edição, prioriza os valores do rascunho; campos como codigo e
+      // media_folder_id podem existir apenas na versão publicada, então
+      // preserva-os como fallback sem sobrescrever valores preenchidos.
+      const result = { ...(published || {}), ...(draft || {}) };
+      for (const key of ['codigo', 'media_folder_id', 'nome_exibicao', 'sortOrder']) {
+        if (result[key] === undefined || result[key] === null || result[key] === '') {
+          result[key] = published?.[key] ?? draft?.[key] ?? result[key];
+        }
+      }
+      result.publicationStatus = published ? 'published' : 'draft';
+      result.publishedAt = published?.publishedAt || null;
+      ctx.body = { result };
+    } catch (error) {
+      strapi.log.error('Erro ao carregar detalhes do anúncio:', error);
+      ctx.throw(500, 'Não foi possível carregar os detalhes do anúncio.');
+    }
+  },
+
 });
