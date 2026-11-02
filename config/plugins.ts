@@ -28,4 +28,8 @@ export default ({env}) => ({
     enabled: true,
     resolve: './src/plugins/landing-pages',
   },
+  'anuncios-admin': {
+    enabled: true,
+    resolve: './src/plugins/anuncios-admin',
+  },
 });

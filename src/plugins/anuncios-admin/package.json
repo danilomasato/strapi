@@ -1,0 +1,10 @@
+{
+  "name": "anuncios-admin",
+  "version": "1.0.0",
+  "private": true,
+  "strapi": {
+    "name": "anuncios-admin",
+    "displayName": "Administração de Anúncios",
+    "description": "Gerenciamento administrativo de anúncios imobiliários"
+  }
+}
