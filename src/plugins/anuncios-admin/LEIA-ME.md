@@ -45,3 +45,6 @@ HOSTINGER_WEBSITE_DOMAIN=tudosobreap.com.br
 
 ### Correção CRUD administrativo
 As rotas administrativas `GET/POST /landing-pages/records`, `PUT/DELETE /landing-pages/records/:documentId` são implementadas no controller `hostinger.js` e usam `strapi.documents("api::landing-page.landing-page")`. O painel não precisa usar a Content API pública para criar/editar registros.
+
+## Correção do status de publicação no Strapi 5
+A listagem administrativa consulta agora a rota autenticada `/anuncios-admin/records`. O controller consulta separadamente as versões `published` e `draft` pelo Document Service e marca como **Publicado** todo `documentId` que possui uma versão publicada. Isso evita classificar como rascunho um anúncio que tem uma versão draft mais recente, mas continua publicado no site. A rota não altera nem republica registros e não modifica o schema ou os lifecycles da API.
