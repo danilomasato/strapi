@@ -394,35 +394,56 @@ export default {
         return;
       }
 
-      const anuncios = await strapi
-        .documents('api::anuncio.anuncio')
-        .findMany({
-          filters: {
-            documentId: {
-              $in: announcementDocumentIds,
-            },
+      const documentService = strapi.documents('api::anuncio.anuncio');
+      const announcementQuery = {
+        filters: {
+          documentId: {
+            $in: announcementDocumentIds,
           },
-          status: 'published',
-          fields: [
-            'codigo',
-            'nome_exibicao',
-            'titulo',
-            'Tipo_de_Anuncio',
-            'publishedAt',
-            'locale',
-            'createdAt',
-          ],
-          sort: ['createdAt:desc'],
-        });
+        },
+        fields: [
+          'codigo',
+          'nome_exibicao',
+          'titulo',
+          'Tipo_de_Anuncio',
+          'publishedAt',
+          'locale',
+          'createdAt',
+          'updatedAt',
+        ],
+        sort: ['createdAt:desc'],
+      };
 
-      const uniqueAnuncios = Array.from(
-        new Map(
-          anuncios.map((anuncio) => [
-            anuncio.documentId,
-            anuncio,
-          ])
-        ).values()
-      );
+      // O plugin de anúncios cria primeiro como rascunho. A ficha do corretor
+      // deve listar tanto rascunhos quanto anúncios publicados.
+      const [publishedAnuncios, draftAnuncios] = await Promise.all([
+        documentService.findMany({ ...announcementQuery, status: 'published' }),
+        documentService.findMany({ ...announcementQuery, status: 'draft' }),
+      ]);
+
+      const anunciosPorDocumentId = new Map();
+      for (const anuncio of publishedAnuncios || []) {
+        if (anuncio?.documentId) {
+          anunciosPorDocumentId.set(anuncio.documentId, {
+            ...anuncio,
+            status: 'Publicado',
+          });
+        }
+      }
+      for (const anuncio of draftAnuncios || []) {
+        if (anuncio?.documentId) {
+          const publicado = anunciosPorDocumentId.get(anuncio.documentId);
+          anunciosPorDocumentId.set(anuncio.documentId, {
+            ...(publicado || {}),
+            ...anuncio,
+            publishedAt: publicado?.publishedAt || anuncio.publishedAt || null,
+            status: publicado ? 'Publicado' : 'Rascunho',
+          });
+        }
+      }
+
+      const uniqueAnuncios = Array.from(anunciosPorDocumentId.values())
+        .sort((a, b) => new Date(b.updatedAt || b.createdAt || 0) - new Date(a.updatedAt || a.createdAt || 0));
 
       const data = uniqueAnuncios.map((anuncio) => {
         const titulo =
@@ -440,13 +461,14 @@ export default {
           titulo,
           Tipo_de_Anuncio: anuncio.Tipo_de_Anuncio,
           publishedAt: anuncio.publishedAt,
+          status: anuncio.status || (anuncio.publishedAt ? 'Publicado' : 'Rascunho'),
           locale: anuncio.locale,
           createdAt: anuncio.createdAt,
         };
       });
 
       strapi.log.info(
-        `[broker-admin] Anúncios publicados encontrados para ${broker.email}: ${data.length}`
+        `[broker-admin] Anúncios encontrados para ${broker.email}: ${data.length} (publicados e rascunhos)`
       );
 
       ctx.body = { data };
