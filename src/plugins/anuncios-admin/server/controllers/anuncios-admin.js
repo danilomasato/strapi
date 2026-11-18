@@ -60,8 +60,9 @@ async function resolveUserById(strapi, id) {
   return null;
 }
 
-async function logAnnouncementOwnershipDiagnostic(strapi, ctx, record, owners) {
+async function logAnnouncementOwnershipDiagnostic(strapi, ctx, published, draft, owners) {
   try {
+    const record = published || draft || {};
     const documentId = String(record?.documentId || ctx.params.documentId || '');
     const ownerId = owners?.[documentId] == null ? null : String(owners[documentId]);
     const populatedCreator = diagnosticUser(record?.createdBy || record?.created_by);
@@ -88,7 +89,10 @@ async function logAnnouncementOwnershipDiagnostic(strapi, ctx, record, owners) {
       codigo: record?.codigo || null,
       documentId,
       titulo: record?.titulo || record?.nome_exibicao || null,
-      status: record?.publishedAt ? 'published' : 'draft',
+      statusReal: published?.publishedAt ? 'published' : 'draft',
+      publishedAt: published?.publishedAt || null,
+      draftExiste: Boolean(draft),
+      draftPublishedAt: draft?.publishedAt || null,
       usuarioQueAbriu: sessionUser || diagnosticUser(currentUser(ctx)),
       createdByPopulado: populatedCreator,
       createdByIdNaTabela: databaseCreatorId,
@@ -107,6 +111,7 @@ async function logAnnouncementOwnershipDiagnostic(strapi, ctx, record, owners) {
     strapi.log.error('[anuncios-admin][diagnostico-abertura] Falha ao registrar diagnóstico de autoria:', error);
   }
 }
+
 async function setOwner(strapi, documentId, ownerId) {
   if (!documentId || !ownerId) return;
   const store = strapi.store({ type: 'plugin', name: 'anuncios-admin' });
@@ -158,9 +163,9 @@ module.exports = ({ strapi }) => ({
       ]);
       if (!published && !draft) return ctx.notFound('Anúncio não encontrado.');
       const result = { ...(published || {}), ...(draft || {}) };
-      // Diagnóstico temporário: registra a autoria e o vínculo adOwners sempre que
-      // um administrador abre a tela de detalhes de um anúncio.
-      await logAnnouncementOwnershipDiagnostic(strapi, ctx, result, owners);
+      // Diagnóstico temporário: usa as versões separadas para não confundir
+      // o publishedAt da versão publicada com o da versão draft.
+      await logAnnouncementOwnershipDiagnostic(strapi, ctx, published, draft, owners);
       if (!canAccess(ctx, result, owners)) return deny(ctx);
       for (const key of ['codigo', 'media_folder_id', 'nome_exibicao', 'sortOrder']) if (result[key] == null || result[key] === '') result[key] = published?.[key] ?? draft?.[key] ?? result[key];
       result.publicationStatus = published ? 'published' : 'draft';
@@ -218,10 +223,26 @@ module.exports = ({ strapi }) => ({
       ]);
       if (!record) return ctx.notFound('Anúncio não encontrado.');
       if (!canAccess(ctx, record, owners)) return deny(ctx);
-      const result = await strapi.documents(UID).publish({ documentId });
-      ctx.body = { data: result };
+      strapi.log.info(`[anuncios-admin][publicacao] Iniciando publicação: ${JSON.stringify({ documentId, codigo: record.codigo || null, usuarioId: userId(currentUser(ctx)) })}`);
+      await strapi.documents(UID).publish({ documentId });
+
+      // Não considerar a operação concluída apenas porque publish() retornou.
+      // Confirmar diretamente que o Strapi criou/atualizou a versão publicada.
+      const published = await strapi.documents(UID).findOne({
+        documentId,
+        status: 'published',
+        populate: POPULATE,
+      });
+
+      if (!published?.publishedAt) {
+        strapi.log.error(`[anuncios-admin][publicacao] Publicação não confirmada: ${JSON.stringify({ documentId, codigo: record.codigo || null, publishedEncontrado: Boolean(published), publishedAt: published?.publishedAt || null })}`);
+        ctx.throw(409, 'O Strapi não confirmou a publicação deste anúncio. Ele permanece como rascunho.');
+      }
+
+      strapi.log.info(`[anuncios-admin][publicacao] Publicação confirmada: ${JSON.stringify({ documentId, codigo: published.codigo || record.codigo || null, publishedAt: published.publishedAt })}`);
+      ctx.body = { data: published, publicationStatus: 'published', publishedAt: published.publishedAt };
     } catch (error) {
-      if (error?.status === 403) throw error;
+      if (error?.status === 403 || error?.status === 409) throw error;
       strapi.log.error('Erro ao publicar anúncio:', error);
       ctx.throw(400, error.message || 'Não foi possível publicar o anúncio.');
     }
@@ -237,10 +258,16 @@ module.exports = ({ strapi }) => ({
       ]);
       if (!record) return ctx.notFound('Anúncio não encontrado.');
       if (!canAccess(ctx, record, owners)) return deny(ctx);
-      const result = await strapi.documents(UID).unpublish({ documentId });
-      ctx.body = { data: result };
+      await strapi.documents(UID).unpublish({ documentId });
+      const stillPublished = await strapi.documents(UID).findOne({ documentId, status: 'published' });
+      if (stillPublished?.publishedAt) {
+        strapi.log.error(`[anuncios-admin][publicacao] Despublicação não confirmada: ${documentId}`);
+        ctx.throw(409, 'O Strapi ainda retorna uma versão publicada deste anúncio.');
+      }
+      strapi.log.info(`[anuncios-admin][publicacao] Despublicação confirmada: ${documentId}`);
+      ctx.body = { data: { documentId }, publicationStatus: 'draft', publishedAt: null };
     } catch (error) {
-      if (error?.status === 403) throw error;
+      if (error?.status === 403 || error?.status === 409) throw error;
       strapi.log.error('Erro ao despublicar anúncio:', error);
       ctx.throw(400, error.message || 'Não foi possível despublicar o anúncio.');
     }

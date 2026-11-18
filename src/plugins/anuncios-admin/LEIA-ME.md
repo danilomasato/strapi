@@ -48,3 +48,11 @@ As rotas administrativas `GET/POST /landing-pages/records`, `PUT/DELETE /landing
 
 ## Correção do status de publicação no Strapi 5
 A listagem administrativa consulta agora a rota autenticada `/anuncios-admin/records`. O controller consulta separadamente as versões `published` e `draft` pelo Document Service e marca como **Publicado** todo `documentId` que possui uma versão publicada. Isso evita classificar como rascunho um anúncio que tem uma versão draft mais recente, mas continua publicado no site. A rota não altera nem republica registros e não modifica o schema ou os lifecycles da API.
+
+## Correção e confirmação de publicação (Strapi 5)
+
+- Ao clicar em **Publicar**, o backend executa a publicação pelo Document Service e consulta novamente `status: 'published'`. A API só retorna sucesso quando encontra a versão publicada com `publishedAt` preenchido.
+- Se o Strapi não confirmar a versão publicada, a rota retorna erro HTTP 409 e o painel não exibe a mensagem de sucesso.
+- Ao clicar em **Salvar** durante a edição de um anúncio que já possui versão publicada, o plugin salva as alterações como rascunho e mantém a versão publicada atual no site. A ação Salvar não despublica mais automaticamente o anúncio.
+- O diagnóstico de autoria agora consulta as versões draft e published separadamente. Isso evita registrar falsamente `draft` quando a versão draft mais recente sobrescreve `publishedAt` ao combinar os dois objetos.
+- Os logs de publicação usam os prefixos `[anuncios-admin][publicacao]` e `[anuncios-admin][diagnostico-abertura]`.
