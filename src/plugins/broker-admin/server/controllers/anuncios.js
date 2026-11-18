@@ -355,16 +355,29 @@ export default {
         return;
       }
 
+      // Anuncios criados pelo plugin anuncios-admin podem ter o proprietário
+      // registrado no plugin store (adOwners), mesmo quando created_by_id
+      // não está preenchido/compatível na tabela de anúncios.
       const announcementRows = await strapi.db
         .connection('anuncios')
         .select('document_id')
         .where('created_by_id', brokerAdmin.id);
 
+      const ownerStore = strapi.store({
+        type: 'plugin',
+        name: 'anuncios-admin',
+      });
+      const ownerMap = (await ownerStore.get({ key: 'adOwners' })) || {};
+      const ownerDocumentIds = Object.entries(ownerMap)
+        .filter(([, ownerId]) => String(ownerId) === String(brokerAdmin.id))
+        .map(([documentId]) => documentId);
+
       const announcementDocumentIds = [
         ...new Set(
-          announcementRows
-            .map((row) => row.document_id)
-            .filter(Boolean)
+          [
+            ...announcementRows.map((row) => row.document_id),
+            ...ownerDocumentIds,
+          ].filter(Boolean)
         ),
       ];
 
