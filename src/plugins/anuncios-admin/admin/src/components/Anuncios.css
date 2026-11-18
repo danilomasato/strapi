@@ -50,3 +50,10 @@
 @media(prefers-reduced-motion:reduce){.an-skeleton-block:after,.an-skeleton-line:after,.an-skeleton-features i:after,.an-skeleton-actions i:after{animation:none}}
 
 .an-publish .an-icon{color:currentColor}
+
+/* Busca de CEP na localização do anúncio */
+.an-cep-row{display:flex;gap:8px;align-items:center}
+.an-cep-row input{flex:1;min-width:0}
+.an-cep-row button{white-space:nowrap;min-height:42px}
+.an-field small{display:block;color:#777a92;font-size:11px;margin-top:5px}
+@media(max-width:600px){.an-cep-row{flex-wrap:wrap}.an-cep-row button{width:100%}}
