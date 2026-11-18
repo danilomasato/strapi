@@ -298,159 +298,174 @@ export default {
         return ctx.notFound('Corretor não encontrado.');
       }
 
-      if (!broker.email) {
+      const brokerEmail = String(broker.email || '').trim().toLowerCase();
+      if (!brokerEmail) {
         strapi.log.warn(
           `[broker-admin] Corretor ${brokerDocumentId} não possui e-mail cadastrado.`
         );
-
         ctx.body = { data: [] };
         return;
       }
 
-      const brokerAdmin = await strapi.db
-        .query('admin::user')
-        .findOne({
-          where: {
-            email: {
-              $eqi: broker.email,
+      // O usuário associado ao corretor pode estar em admin_users ou em up_users.
+      // Não presumimos que o ID do registro do corretor seja o ID do usuário.
+      const candidateUserIds = new Set();
+      const candidateEmails = new Set([brokerEmail]);
+      const userLookups = [
+        {
+          uid: 'admin::user',
+          label: 'admin_users',
+        },
+        {
+          uid: 'plugin::users-permissions.user',
+          label: 'up_users',
+        },
+      ];
+
+      for (const lookup of userLookups) {
+        try {
+          const matchedUser = await strapi.db.query(lookup.uid).findOne({
+            where: {
+              email: {
+                $eqi: brokerEmail,
+              },
             },
-          },
-          select: ['id', 'email'],
-        });
+            select: ['id', 'email'],
+          });
 
-      if (!brokerAdmin) {
-        strapi.log.warn(
-          `[broker-admin] Nenhum usuário administrativo encontrado para o e-mail do corretor ${broker.email}.`
-        );
+          if (matchedUser?.id != null) {
+            candidateUserIds.add(String(matchedUser.id));
+          }
 
-        ctx.body = { data: [] };
-        return;
+          if (matchedUser?.email) {
+            candidateEmails.add(String(matchedUser.email).trim().toLowerCase());
+          }
+        } catch (lookupError) {
+          // Uma das fontes pode não estar disponível nesta instalação do Strapi.
+          strapi.log.debug(
+            `[broker-admin] Não foi possível consultar ${lookup.label}: ${lookupError.message}`
+          );
+        }
       }
 
-      strapi.log.info(
-        `[broker-admin][diagnostico] Consultando anúncios: ${JSON.stringify({
-          brokerDocumentId,
-          brokerEmail: broker.email,
-          brokerAdminId: brokerAdmin.id,
-          requisitanteAdminId: adminUser.id,
-        })}`
-      );
+      // 1) Procura pelo created_by_id diretamente na tabela de anúncios.
+      const directCreatorDocumentIds = new Set();
+      if (candidateUserIds.size) {
+        try {
+          const creatorRows = await strapi.db
+            .connection('anuncios')
+            .select('document_id')
+            .whereIn('created_by_id', Array.from(candidateUserIds));
 
-      await diagnosticarAnuncios(
-        broker.email,
-        brokerAdmin.id
-      );
-
-      const createdByRows = await strapi.db
-        .connection('admin_users')
-        .select('id')
-        .where('id', brokerAdmin.id);
-
-      if (!createdByRows.length) {
-        strapi.log.warn(
-          `[broker-admin] Usuário administrativo ${brokerAdmin.id} não encontrado na tabela admin_users.`
-        );
-
-        ctx.body = { data: [] };
-        return;
+          for (const row of creatorRows || []) {
+            if (row.document_id) directCreatorDocumentIds.add(String(row.document_id));
+          }
+        } catch (queryError) {
+          strapi.log.warn(
+            `[broker-admin] Falha ao consultar created_by_id: ${queryError.message}`
+          );
+        }
       }
 
-      // Anuncios criados pelo plugin anuncios-admin podem ter o proprietário
-      // registrado no plugin store (adOwners), mesmo quando created_by_id
-      // não está preenchido/compatível na tabela de anúncios.
-      const announcementRows = await strapi.db
-        .connection('anuncios')
-        .select('document_id')
-        .where('created_by_id', brokerAdmin.id);
-
+      // 2) Procura pelo vínculo salvo pelo plugin de anúncios (adOwners).
       const ownerStore = strapi.store({
         type: 'plugin',
         name: 'anuncios-admin',
       });
       const ownerMap = (await ownerStore.get({ key: 'adOwners' })) || {};
-      const ownerDocumentIds = Object.entries(ownerMap)
-        .filter(([, ownerId]) => String(ownerId) === String(brokerAdmin.id))
-        .map(([documentId]) => documentId);
+      const ownerDocumentIds = new Set();
 
-      const announcementDocumentIds = [
-        ...new Set(
-          [
-            ...announcementRows.map((row) => row.document_id),
-            ...ownerDocumentIds,
-          ].filter(Boolean)
-        ),
-      ];
-
-      strapi.log.info(
-        `[broker-admin][diagnostico] DocumentIds associados ao autor ${brokerAdmin.id}: ${announcementDocumentIds.length}`
-      );
-
-      if (!announcementDocumentIds.length) {
-        strapi.log.warn(
-          `[broker-admin] Nenhum anúncio encontrado com created_by_id=${brokerAdmin.id}.`
-        );
-
-        ctx.body = { data: [] };
-        return;
+      for (const [documentId, ownerValue] of Object.entries(ownerMap)) {
+        const normalizedOwner = String(ownerValue || '').trim().toLowerCase();
+        if (
+          candidateUserIds.has(String(ownerValue)) ||
+          candidateEmails.has(normalizedOwner)
+        ) {
+          ownerDocumentIds.add(String(documentId));
+        }
       }
 
-      const documentService = strapi.documents('api::anuncio.anuncio');
-      const announcementQuery = {
-        filters: {
-          documentId: {
-            $in: announcementDocumentIds,
-          },
-        },
-        fields: [
-          'codigo',
-          'nome_exibicao',
-          'titulo',
-          'Tipo_de_Anuncio',
-          'publishedAt',
-          'locale',
-          'createdAt',
-          'updatedAt',
-        ],
-        sort: ['createdAt:desc'],
-      };
-
-      // O plugin de anúncios cria primeiro como rascunho. A ficha do corretor
-      // deve listar tanto rascunhos quanto anúncios publicados.
-      const [publishedAnuncios, draftAnuncios] = await Promise.all([
-        documentService.findMany({ ...announcementQuery, status: 'published' }),
-        documentService.findMany({ ...announcementQuery, status: 'draft' }),
+      // 3) Confere o e-mail diretamente no createdBy populado do documento.
+      // Consulta publicados e rascunhos, pois ambos pertencem ao corretor.
+      const documents = strapi.documents('api::anuncio.anuncio');
+      const [publishedRecords, draftRecords] = await Promise.all([
+        documents.findMany({
+          status: 'published',
+          populate: { createdBy: true },
+          sort: { updatedAt: 'desc' },
+          limit: 1000,
+        }),
+        documents.findMany({
+          status: 'draft',
+          populate: { createdBy: true },
+          sort: { updatedAt: 'desc' },
+          limit: 1000,
+        }),
       ]);
 
-      const anunciosPorDocumentId = new Map();
-      for (const anuncio of publishedAnuncios || []) {
-        if (anuncio?.documentId) {
-          anunciosPorDocumentId.set(anuncio.documentId, {
-            ...anuncio,
-            status: 'Publicado',
+      const allRecordsByDocumentId = new Map();
+      for (const record of publishedRecords || []) {
+        if (record?.documentId) {
+          allRecordsByDocumentId.set(String(record.documentId), {
+            ...record,
+            publicationStatus: 'published',
           });
         }
       }
-      for (const anuncio of draftAnuncios || []) {
-        if (anuncio?.documentId) {
-          const publicado = anunciosPorDocumentId.get(anuncio.documentId);
-          anunciosPorDocumentId.set(anuncio.documentId, {
-            ...(publicado || {}),
-            ...anuncio,
-            publishedAt: publicado?.publishedAt || anuncio.publishedAt || null,
-            status: publicado ? 'Publicado' : 'Rascunho',
+      for (const record of draftRecords || []) {
+        if (record?.documentId) {
+          const key = String(record.documentId);
+          const existing = allRecordsByDocumentId.get(key);
+          allRecordsByDocumentId.set(key, {
+            ...(existing || {}),
+            ...record,
+            publicationStatus: existing ? 'published' : 'draft',
           });
         }
       }
 
-      const uniqueAnuncios = Array.from(anunciosPorDocumentId.values())
-        .sort((a, b) => new Date(b.updatedAt || b.createdAt || 0) - new Date(a.updatedAt || a.createdAt || 0));
+      const matchedRecords = Array.from(allRecordsByDocumentId.values()).filter(
+        (record) => {
+          const creator = record.createdBy || record.created_by || null;
+          const creatorId = creator?.id == null ? null : String(creator.id);
+          const creatorEmail = String(creator?.email || '').trim().toLowerCase();
+          const documentId = String(record.documentId || '');
+
+          return (
+            (creatorId && candidateUserIds.has(creatorId)) ||
+            (creatorEmail && candidateEmails.has(creatorEmail)) ||
+            directCreatorDocumentIds.has(documentId) ||
+            ownerDocumentIds.has(documentId)
+          );
+        }
+      );
+
+      const uniqueAnuncios = Array.from(
+        new Map(
+          matchedRecords.map((anuncio) => [String(anuncio.documentId), anuncio])
+        ).values()
+      ).sort(
+        (a, b) =>
+          new Date(b.updatedAt || b.publishedAt || b.createdAt || 0) -
+          new Date(a.updatedAt || a.publishedAt || a.createdAt || 0)
+      );
+
+      strapi.log.info(
+        `[broker-admin][diagnostico] Busca de anúncios para ${broker.email}: ${JSON.stringify({
+          brokerDocumentId,
+          candidateUserIds: Array.from(candidateUserIds),
+          encontradosPorCreatedById: directCreatorDocumentIds.size,
+          encontradosPorAdOwners: ownerDocumentIds.size,
+          encontradosPorEmailOuCreatedBy: matchedRecords.length,
+          totalFinal: uniqueAnuncios.length,
+          codigo297B1A3B: uniqueAnuncios.some((item) => String(item.codigo || '').toUpperCase() === '297B1A3B'),
+        })}`
+      );
 
       const data = uniqueAnuncios.map((anuncio) => {
         const titulo =
-          (typeof anuncio.titulo === 'string' &&
-            anuncio.titulo.trim()) ||
-          (typeof anuncio.nome_exibicao === 'string' &&
-            anuncio.nome_exibicao.trim()) ||
+          (typeof anuncio.titulo === 'string' && anuncio.titulo.trim()) ||
+          (typeof anuncio.nome_exibicao === 'string' && anuncio.nome_exibicao.trim()) ||
           'Sem título';
 
         return {
@@ -461,14 +476,14 @@ export default {
           titulo,
           Tipo_de_Anuncio: anuncio.Tipo_de_Anuncio,
           publishedAt: anuncio.publishedAt,
-          status: anuncio.status || (anuncio.publishedAt ? 'Publicado' : 'Rascunho'),
+          publicationStatus: anuncio.publicationStatus,
           locale: anuncio.locale,
           createdAt: anuncio.createdAt,
         };
       });
 
       strapi.log.info(
-        `[broker-admin] Anúncios encontrados para ${broker.email}: ${data.length} (publicados e rascunhos)`
+        `[broker-admin] Anúncios encontrados para ${broker.email}: ${data.length}`
       );
 
       ctx.body = { data };
